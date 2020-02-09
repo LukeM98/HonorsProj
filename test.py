@@ -5,7 +5,7 @@ import random
 
 WIDTH = 500
 HEIGHT = 500
-RADIUS = 40
+RADIUS = 5
 
 
 class Particle:
@@ -44,23 +44,56 @@ def collision(x1, x2, y1, y2):
 def main():
 
     win = GraphWin("MyWindow", WIDTH, HEIGHT)
-
+    num_particles = 30
     # error with velocity 4 and 13
-    cir = Particle(RADIUS, 5, 10, Point(250, 300), 'black', win, 1)
-    cir2 = Particle(RADIUS, 6, -8, Point(350, 200), 'red', win, 1)
+    particles = []
+    n = 0
+    j = 0
+    for i in range(num_particles):
+
+        particles.append(Particle(RADIUS, random.randint(-11, 11), random.randint(-11, 11), Point(random.randint(0, WIDTH-RADIUS), random.randint(0, HEIGHT-RADIUS)), color_rgb(random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)), win, 1))
+
+        while particles[i].velx == 0 and particles[i].vely == 0:
+            particles[i].velx = random.randint(-11, 11)
+            particles[i].vely = random.randint(-11, 11)
+
+
+
+    #cir = Particle(RADIUS, 5, 10, Point(250, 300), 'black', win, 1)
+    #cir2 = Particle(RADIUS, 6, -8, Point(350, 200), 'red', win, 1)
     print("start")
-    t_end = time.time() + 150
+    t_end = time.time() + 60
     x1_bool = False
     x1_bool2 = False
     x2_bool = False
     x2_bool2 = False
+
     while time.time() < t_end:
-        y1 = cir.get_Posy()
-        y2 = cir2.get_Posy()
+        for i in range(num_particles): # collision detection with wall
+            y1 = particles[i].get_Posy()
+            x1 = particles[i].get_Posx()
+            if x1 >= WIDTH - particles[i].rad:
+                particles[i].velx *= -1
 
-        x1 = cir.get_Posx()
-        x2 = cir2.get_Posx()
+            if x1 <= particles[i].rad:
+                particles[i].velx *= -1
 
+            if y1 >= HEIGHT - particles[i].rad:
+                    particles[i].vely *= -1
+
+            if y1 <= particles[i].rad:
+                    particles[i].vely *= -1
+
+
+
+
+
+        #y1 = cir.get_Posy()
+        #y2 = cir2.get_Posy()
+
+       # x1 = cir.get_Posx()
+       # x2 = cir2.get_Posx()
+        """
         if x1 >= WIDTH - cir.rad:
             if not x1_bool:
                 cir.velx *= -1
@@ -100,9 +133,33 @@ def main():
 
         if y2 <= cir2.rad:
             cir2.vely *= -1
-
+        """
        # print(cir.get_Posx())
-        if collision(x1, x2, y1, y2):
+
+        for i in range(int(num_particles/2) +1):
+            for j in range(i,num_particles,1):
+                x1 = particles[i].get_Posx()
+                y1 = particles[i].get_Posy()
+                x2 = particles[j].get_Posx()
+                y2 = particles[j].get_Posy()
+
+                if collision(x1, x2, y1, y2):
+                    cir_oldvelx = particles[i].velx
+                    cir2_oldvelx = particles[j].velx
+                    particles[j].velx = ((
+                                         particles[i].mass * cir_oldvelx + particles[j].mass * cir2_oldvelx) - cir2_oldvelx * particles[i].mass + cir_oldvelx * particles[i].mass) / (
+                                        particles[i].mass + particles[j].mass)
+                    particles[i].velx = particles[j].velx + cir2_oldvelx - cir_oldvelx
+                    cir_oldvely = particles[i].vely
+                    cir2_oldvely = particles[j].vely
+                    particles[j].vely = ((
+                                         particles[i].mass * cir_oldvely + particles[j].mass * cir2_oldvely) - cir2_oldvely * particles[i].mass + cir_oldvely * particles[i].mass) / (
+                                        particles[i].mass + particles[j].mass)
+                    particles[i].vely = particles[j].vely + cir2_oldvely - cir_oldvely
+
+
+
+        """if collision(x1, x2, y1, y2):
             if cir.vely == 0 and cir2.vely == 0:
                 cir_oldvelx = cir.velx
                 cir2_oldvelx = cir2.velx
@@ -133,7 +190,7 @@ def main():
                                          cir.mass * cir_oldvely + cir2.mass * cir2_oldvely) - cir2_oldvely * cir.mass + cir_oldvely * cir.mass) / (
                                     cir.mass + cir2.mass)
                 cir.vely = cir2.vely + cir2_oldvely - cir_oldvely
-                """
+                 START
                 print("cirx = ", cir.get_Posx())
                 print("ciry = ", cir.get_Posy())
                 print("cir2x = ", cir2.get_Posx())
@@ -162,17 +219,17 @@ def main():
                 cir.vely = oldvely + impy/cir.mass
                 cir2.velx = oldvelx2 - impx/cir2.mass
                 cir2.vely = oldvely2 - impy/cir2.mass
-"""
+ FINISH
                 print("new cir velx = ", cir.velx)
                 print("new cir vely = ", cir.vely)
                 print("new cir2 velx = ", cir2.velx)
                 print("new cir2 vely", cir2.vely)
                 print("")
+"""
+        for i in range(num_particles):
+            particles[i].cir.move(particles[i].velx, -particles[i].vely)
 
-        cir.cir.move(cir.velx, -cir.vely)
-        cir2.cir.move(cir2.velx, -cir2.vely)
-
-        time.sleep(.1)
+        time.sleep(.05)
 
     #win.getMouse()
     win.close()
