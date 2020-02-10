@@ -15,7 +15,6 @@ class Particle:
     cir = 0
     mass = 0
 
-
     def __init__(self, radius, velocityx, velocityy, pt, color, win, m):
         self.rad = radius
         self.velx = velocityx
@@ -45,14 +44,17 @@ def main():
 
     win = GraphWin("MyWindow", WIDTH, HEIGHT)
     num_particles = 30
+    colors = ['red', 'green', 'blue', 'yellow', 'black', 'white', 'orange', 'brown', 'purple', 'pink', 'teal', 'maroon', 'magenta', 'tan', 'gold', 'grey', 'cyan']
     # error with velocity 4 and 13
     particles = []
     n = 0
     j = 0
     for i in range(num_particles):
 
-        particles.append(Particle(RADIUS, random.randint(-11, 11), random.randint(-11, 11), Point(random.randint(0, WIDTH-RADIUS), random.randint(0, HEIGHT-RADIUS)), color_rgb(random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)), win, 1))
-
+        particles.append(Particle(RADIUS, random.randint(-11, 11), random.randint(-11, 11), Point(random.randint(0, WIDTH-RADIUS), random.randint(0, HEIGHT-RADIUS)), colors[j], win, 1))
+        j += 1
+        if j >= len(colors):
+            j = 0
         while particles[i].velx == 0 and particles[i].vely == 0:
             particles[i].velx = random.randint(-11, 11)
             particles[i].vely = random.randint(-11, 11)
@@ -69,7 +71,7 @@ def main():
     x2_bool2 = False
 
     while time.time() < t_end:
-        for i in range(num_particles): # collision detection with wall
+        for i in range(num_particles):  # collision detection with wall
             y1 = particles[i].get_Posy()
             x1 = particles[i].get_Posx()
             if x1 >= WIDTH - particles[i].rad:
@@ -136,8 +138,8 @@ def main():
         """
        # print(cir.get_Posx())
 
-        for i in range(int(num_particles/2) +1):
-            for j in range(i,num_particles,1):
+        for i in range(num_particles):
+            for j in range(i, num_particles, 1):
                 x1 = particles[i].get_Posx()
                 y1 = particles[i].get_Posy()
                 x2 = particles[j].get_Posx()
