@@ -8,7 +8,7 @@ WIDTH = 500
 HEIGHT = 500
 RADIUS = 5
 
-num_particles = 500
+num_particles = 207
 timestep = .03
 duration = 5
 
