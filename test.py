@@ -10,7 +10,7 @@ RADIUS = 5
 
 num_particles = 2
 timestep = .03
-duration = 3
+duration = 20
 
 G_CONST = 1
 
@@ -38,17 +38,19 @@ class Particle:
         return self.cir.getCenter().getY()
 
 
-def collision(x1, x2, y1, y2):
+def collision(x1, x2, y1, y2, rad1, rad2):
     distance = math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
 
-    if distance <= RADIUS + RADIUS:
+    if distance <= rad1 + rad2:
         return True
     else:
         return False
 
 
 def main():
+    orig_stdout = sys.stdout
     sys.stdout = open('output.txt', 'w')
+
     win = GraphWin("MyWindow", WIDTH, HEIGHT)
 
     colors = ['red', 'green', 'blue', 'yellow', 'black', 'white', 'orange', 'brown', 'purple', 'pink', 'teal', 'maroon', 'magenta', 'tan', 'gold', 'grey', 'cyan']
@@ -80,7 +82,7 @@ def main():
 """
     particles.append(Particle(20, 0, 0,
                               Point(250, 250), colors[j],
-                              win, 20))
+                              win, 4000))
     particles.append(Particle(RADIUS, 0, 0,
                               Point(400, 400), colors[j],
                               win, 1))
@@ -124,7 +126,7 @@ def main():
                 x2 = particles[j].get_Posx()
                 y2 = particles[j].get_Posy()
 
-                if collision(x1, x2, y1, y2):
+                if collision(x1, x2, y1, y2, particles[i].rad, particles[j].rad):
                     cir_oldvelx = particles[i].velx
                     cir2_oldvelx = particles[j].velx
                     particles[j].velx = ((
@@ -138,22 +140,49 @@ def main():
                                         particles[i].mass + particles[j].mass)
                     particles[i].vely = particles[j].vely + cir2_oldvely - cir_oldvely
 
-                #GRAVITY STUFF HERE
-                force_gravx = (G_CONST * particles[i].mass * particles[j].mass)/(x1-x2)
-                force_gravy = (G_CONST * particles[i].mass * particles[j].mass)/(y1-y2)
+                c_sq = (x1-x2)*(x1-x2) + (y1-y2) * (y1-y2)
+                x_dist = math.sqrt(c_sq - ((y1-y2)*(y1-y2)))
+                y_dist = math.sqrt(c_sq - ((x1-x2)*(x1-x2)))
+                force_gravx = (G_CONST * particles[i].mass * particles[j].mass)/((x1-x2)*(x1-x2))
+                force_gravy = (G_CONST * particles[i].mass * particles[j].mass)/((y1-y2)*(y1-y2))
 
                 p1_acelx = force_gravx/particles[i].mass
                 p2_acelx = force_gravx/particles[j].mass
 
-                particles[i].velx = particles[i].velx + p1_acelx*timestep
-                particles[j].velx = particles[j].velx + p2_acelx*timestep
-
                 p1_acely = force_gravy / particles[i].mass
                 p2_acely = force_gravy / particles[j].mass
+
+                if x1 > x2 and y1 < y2:
+                    p1_acelx = -p1_acelx
+                    p1_acely = -p1_acely
+                elif x1 < x2 and y1 < y2:
+                    p2_acelx = -p2_acelx
+                    p1_acely = -p1_acely
+                elif x1 > x2 and y1 > y2:
+                    p1_acelx = -p1_acelx
+                    p2_acely = -p2_acely
+                elif x1 < x2 and y1 > y2:
+                    p2_acely = -p2_acely
+                    p2_acelx = -p2_acelx
+                    print("true", file=orig_stdout)
+                # need scenarios where x and y = 0
+
+
+
+
+                #print("x1: ", x1, file=orig_stdout)
+                #print("y1: ", y1, file=orig_stdout)
+                #print("x2: ", x2, file=orig_stdout)
+                #print("y2: ", y2, file=orig_stdout)
+                #print()
+                particles[i].velx = particles[i].velx + p1_acelx*timestep
+                particles[j].velx = particles[j].velx + p2_acelx*timestep
 
                 particles[i].vely = particles[i].vely + p1_acely * timestep
                 particles[j].vely = particles[j].vely + p2_acely * timestep
 
+    #            print(particles[j].velx, "\n", file=orig_stdout)
+     #           print(particles[j].velx, "\n", file=orig_stdout)
 
 
 
