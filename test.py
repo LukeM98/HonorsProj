@@ -8,9 +8,11 @@ WIDTH = 500
 HEIGHT = 500
 RADIUS = 5
 
-num_particles = 207
+num_particles = 2
 timestep = .03
-duration = 5
+duration = 3
+
+G_CONST = 1
 
 
 class Particle:
@@ -60,6 +62,7 @@ def main():
     print(num_particles)
     print(num_timesteps)
     print()
+    """
     for i in range(num_particles):
 
         particles.append(Particle(RADIUS, random.randint(-11, 11), random.randint(-11, 11), Point(random.randint(0, WIDTH-RADIUS), random.randint(0, HEIGHT-RADIUS)), colors[j], win, 1))
@@ -74,7 +77,13 @@ def main():
         j += 1
         if j >= len(colors):
             j = 0
-
+"""
+    particles.append(Particle(20, 0, 0,
+                              Point(250, 250), colors[j],
+                              win, 20))
+    particles.append(Particle(RADIUS, 0, 0,
+                              Point(400, 400), colors[j],
+                              win, 1))
     print()
     #cir = Particle(RADIUS, 5, 10, Point(250, 300), 'black', win, 1)
     #cir2 = Particle(RADIUS, 6, -8, Point(350, 200), 'red', win, 1)
@@ -109,7 +118,7 @@ def main():
        # print(cir.get_Posx())
 
         for i in range(num_particles):
-            for j in range(i, num_particles, 1):
+            for j in range(i+1, num_particles, 1):
                 x1 = particles[i].get_Posx()
                 y1 = particles[i].get_Posy()
                 x2 = particles[j].get_Posx()
@@ -128,6 +137,25 @@ def main():
                                          particles[i].mass * cir_oldvely + particles[j].mass * cir2_oldvely) - cir2_oldvely * particles[i].mass + cir_oldvely * particles[i].mass) / (
                                         particles[i].mass + particles[j].mass)
                     particles[i].vely = particles[j].vely + cir2_oldvely - cir_oldvely
+
+                #GRAVITY STUFF HERE
+                force_gravx = (G_CONST * particles[i].mass * particles[j].mass)/(x1-x2)
+                force_gravy = (G_CONST * particles[i].mass * particles[j].mass)/(y1-y2)
+
+                p1_acelx = force_gravx/particles[i].mass
+                p2_acelx = force_gravx/particles[j].mass
+
+                particles[i].velx = particles[i].velx + p1_acelx*timestep
+                particles[j].velx = particles[j].velx + p2_acelx*timestep
+
+                p1_acely = force_gravy / particles[i].mass
+                p2_acely = force_gravy / particles[j].mass
+
+                particles[i].vely = particles[i].vely + p1_acely * timestep
+                particles[j].vely = particles[j].vely + p2_acely * timestep
+
+
+
 
         for i in range(num_particles):
             print(particles[i].get_Posx(), particles[i].get_Posy())
