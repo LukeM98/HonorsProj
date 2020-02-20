@@ -84,7 +84,7 @@ def main():
                               Point(250, 250), colors[j],
                               win, 4000))
     particles.append(Particle(RADIUS, 0, 0,
-                              Point(400, 400), colors[j],
+                              Point(100, 466), colors[j],
                               win, 1))
     print()
     #cir = Particle(RADIUS, 5, 10, Point(250, 300), 'black', win, 1)
@@ -117,7 +117,6 @@ def main():
                     particles[i].vely *= -1
 
 
-       # print(cir.get_Posx())
 
         for i in range(num_particles):
             for j in range(i+1, num_particles, 1):
@@ -140,18 +139,31 @@ def main():
                                         particles[i].mass + particles[j].mass)
                     particles[i].vely = particles[j].vely + cir2_oldvely - cir_oldvely
 
+
+
                 c_sq = (x1-x2)*(x1-x2) + (y1-y2) * (y1-y2)
                 x_dist = math.sqrt(c_sq - ((y1-y2)*(y1-y2)))
                 y_dist = math.sqrt(c_sq - ((x1-x2)*(x1-x2)))
-                force_gravx = (G_CONST * particles[i].mass * particles[j].mass)/((x1-x2)*(x1-x2))
-                force_gravy = (G_CONST * particles[i].mass * particles[j].mass)/((y1-y2)*(y1-y2))
-
+                force_gravx = (G_CONST * particles[i].mass * particles[j].mass)/(x_dist * x_dist)
+                # problem is when distance is very close, the tiny distance divides the number giving a huge output
+                force_gravy = (G_CONST * particles[i].mass * particles[j].mass)/(y_dist * y_dist)
                 p1_acelx = force_gravx/particles[i].mass
                 p2_acelx = force_gravx/particles[j].mass
 
                 p1_acely = force_gravy / particles[i].mass
                 p2_acely = force_gravy / particles[j].mass
 
+              #  print("y1: ", y1, " y2: ", y2, " y_dist: ", y_dist, " y1-y2: ", (y1-y2),file=orig_stdout)
+               # print(file=orig_stdout)
+                # FIND A WAY TO MAKE THE ACCELERATION WORK WHEN THE BALLS CHANGE RELATIVE POSITION
+                """if x_dist < 1:
+                    p1_acelx = 0
+                    p2_acelx = 0
+                    print("HERE\n\n\n", file=orig_stdout)
+                elif y_dist < 1:
+                    p1_acely = 0
+                    p2_acely = 0
+                    print("HERE2\n\n\n", file=orig_stdout)"""
                 if x1 > x2 and y1 < y2:
                     p1_acelx = -p1_acelx
                     p1_acely = -p1_acely
@@ -164,12 +176,9 @@ def main():
                 elif x1 < x2 and y1 > y2:
                     p2_acely = -p2_acely
                     p2_acelx = -p2_acelx
-                    print("true", file=orig_stdout)
+
+
                 # need scenarios where x and y = 0
-
-
-
-
                 #print("x1: ", x1, file=orig_stdout)
                 #print("y1: ", y1, file=orig_stdout)
                 #print("x2: ", x2, file=orig_stdout)
@@ -183,8 +192,6 @@ def main():
 
     #            print(particles[j].velx, "\n", file=orig_stdout)
      #           print(particles[j].velx, "\n", file=orig_stdout)
-
-
 
         for i in range(num_particles):
             print(particles[i].get_Posx(), particles[i].get_Posy())
