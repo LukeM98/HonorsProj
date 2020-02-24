@@ -64,38 +64,38 @@ def main():
     print(num_particles)
     print(num_timesteps)
     print()
-    """
+
     for i in range(num_particles):
 
-        particles.append(Particle(RADIUS, random.randint(-11, 11), random.randint(-11, 11), Point(random.randint(0, WIDTH-RADIUS), random.randint(0, HEIGHT-RADIUS)), colors[j], win, 1))
+        particles.append(Particle(RADIUS, random.randint(-11, 11), random.randint(-11, 11),
+                                  Point(random.randint(0, WIDTH - RADIUS), random.randint(0, HEIGHT - RADIUS)),
+                                  colors[j], win, 1))
 
         while particles[i].velx == 0 and particles[i].vely == 0:
             particles[i].velx = random.randint(-11, 11)
-            particles[i].vely = random.randint(-11, 11)
 
+            particles[i].vely = random.randint(-11, 11)
+          
         print(particles[i].rad, particles[i].get_Posx(), particles[i].get_Posy(), colors[j])
 
-        #radius, posx, posy, color, mass
+        # radius, posx, posy, color, mass
+
         j += 1
+
         if j >= len(colors):
             j = 0
-"""
-    particles.append(Particle(20, 0, 0,
-                              Point(250, 250), colors[j],
-                              win, 4000))
-    particles.append(Particle(RADIUS, 0, 0,
-                              Point(100, 466), colors[j],
-                              win, 1))
-    print()
-    #cir = Particle(RADIUS, 5, 10, Point(250, 300), 'black', win, 1)
-    #cir2 = Particle(RADIUS, 6, -8, Point(350, 200), 'red', win, 1)
 
-    t_end = time.time() + duration
-    x1_bool = False
-    x1_bool2 = False
-    x2_bool = False
-    x2_bool2 = False
-    counter = 0
+
+
+    print()
+
+   # particles.append(Particle(20, 0, 0,
+       #                       Point(random.randint(0, WIDTH - RADIUS), random.randint(0, HEIGHT - RADIUS)), colors[j],
+      #                        win, 4000))
+   # particles.append(Particle(RADIUS, 0, 0,
+    #                          Point(random.randint(0, WIDTH - RADIUS), random.randint(0, HEIGHT - RADIUS)), colors[j],
+     #                         win, 1))
+
     for k in range(int(num_timesteps)):
         for i in range(num_particles):  # collision detection with wall
             y1 = particles[i].get_Posy()
@@ -115,8 +115,6 @@ def main():
             if y1 <= particles[i].rad:
                 if particles[i].vely > 0:
                     particles[i].vely *= -1
-
-
 
         for i in range(num_particles):
             for j in range(i+1, num_particles, 1):
@@ -139,70 +137,116 @@ def main():
                                         particles[i].mass + particles[j].mass)
                     particles[i].vely = particles[j].vely + cir2_oldvely - cir_oldvely
 
-
-
                 c_sq = (x1-x2)*(x1-x2) + (y1-y2) * (y1-y2)
                 x_dist = math.sqrt(c_sq - ((y1-y2)*(y1-y2)))
                 y_dist = math.sqrt(c_sq - ((x1-x2)*(x1-x2)))
-                force_gravx = (G_CONST * particles[i].mass * particles[j].mass)/(x_dist * x_dist)
-                # problem is when distance is very close, the tiny distance divides the number giving a huge output
-                force_gravy = (G_CONST * particles[i].mass * particles[j].mass)/(y_dist * y_dist)
-                p1_acelx = force_gravx/particles[i].mass
-                p2_acelx = force_gravx/particles[j].mass
 
-                p1_acely = force_gravy / particles[i].mass
-                p2_acely = force_gravy / particles[j].mass
+                distance = math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
 
-              #  print("y1: ", y1, " y2: ", y2, " y_dist: ", y_dist, " y1-y2: ", (y1-y2),file=orig_stdout)
-               # print(file=orig_stdout)
-                # FIND A WAY TO MAKE THE ACCELERATION WORK WHEN THE BALLS CHANGE RELATIVE POSITION
-                """if x_dist < 1:
-                    p1_acelx = 0
-                    p2_acelx = 0
-                    print("HERE\n\n\n", file=orig_stdout)
-                elif y_dist < 1:
-                    p1_acely = 0
-                    p2_acely = 0
-                    print("HERE2\n\n\n", file=orig_stdout)"""
-                if x1 > x2 and y1 < y2:
+                force_grav = (G_CONST * particles[i].mass * particles[j].mass) / (distance*distance)
+
+                p1_acel = force_grav/particles[i].mass
+                p2_acel = force_grav/particles[j].mass
+
+                p1_acelx = 0
+                p2_acely = 0
+                p1_acely = 0
+                p2_acelx = 0
+
+                if x1 > x2 and y1 < y2: # REPEAT THIS FOR OTHER 3 SCENARIOS
+                    #p1_acel = - p1_acel
+
+                    deg1 = math.acos(y_dist / distance)
+                    deg2 = math.acos(x_dist / distance)
+
+                    p1_acelx = (math.sin(deg1)) * p1_acel
+                    p1_acely = (math.cos(deg1)) * p1_acel
+
+                    p2_acelx = (math.cos(deg2)) * p2_acel
+                    p2_acely = (math.sin(deg2)) * p2_acel
+
                     p1_acelx = -p1_acelx
                     p1_acely = -p1_acely
+
                 elif x1 < x2 and y1 < y2:
+
+                   # p2_acel = -p2_acel
+
+                    deg1 = math.acos(y_dist / distance)
+                    deg2 = math.acos(x_dist / distance)
+
+                    p1_acelx = (math.sin(deg1)) * p1_acel
+                    p1_acely = (math.cos(deg1)) * p1_acel
+
+                    p2_acelx = (math.cos(deg2)) * p2_acel
+                    p2_acely = (math.sin(deg2)) * p2_acel
+
                     p2_acelx = -p2_acelx
                     p1_acely = -p1_acely
                 elif x1 > x2 and y1 > y2:
-                    p1_acelx = -p1_acelx
+                    deg1 = math.asin(y_dist / distance)
+                    deg2 = math.asin(x_dist / distance)
+
+                    p1_acely = (math.sin(deg1)) * p1_acel
+                    p1_acelx = (math.cos(deg1)) * p1_acel
+
+                    p2_acely = (math.cos(deg2)) * p2_acel
+                    p2_acelx = (math.sin(deg2)) * p2_acel
+
                     p2_acely = -p2_acely
+                    p1_acelx = - p1_acelx
+
                 elif x1 < x2 and y1 > y2:
-                    p2_acely = -p2_acely
+                    deg1 = math.asin(y_dist / distance)
+                    deg2 = math.asin(x_dist / distance)
+
+                    p1_acely = (math.sin(deg1)) * p1_acel
+                    p1_acelx = (math.cos(deg1)) * p1_acel
+
+                    p2_acely = (math.cos(deg2)) * p2_acel
+                    p2_acelx = (math.sin(deg2)) * p2_acel
+
                     p2_acelx = -p2_acelx
+                    p2_acely = -p2_acely
+                elif x1 == x2 and y1 > y2:
+                    p1_acelx = 0
+                    p2_acelx = 0
+                    p2_acely = -p2_acel
+                    p1_acely = p1_acel
+                elif x1 == x2 and y1 < y2:
+                    p1_acelx = 0
+                    p2_acelx = 0
+                    p2_acely = p2_acel
+                    p1_acely = -p1_acel
+                elif x1 > x2 and y1 == y2:
+                    p1_acelx = -p1_acel
+                    p2_acelx = p2_acel
+                    p1_acely = 0
+                    p2_acely = 0
+                elif x1 < x2 and y1 == y2:
+                    p1_acelx = p1_acel
+                    p2_acelx = -p2_acel
+                    p1_acely = 0
+                    p2_acely = 0
 
 
-                # need scenarios where x and y = 0
-                #print("x1: ", x1, file=orig_stdout)
-                #print("y1: ", y1, file=orig_stdout)
-                #print("x2: ", x2, file=orig_stdout)
-                #print("y2: ", y2, file=orig_stdout)
-                #print()
+
+
+
                 particles[i].velx = particles[i].velx + p1_acelx*timestep
                 particles[j].velx = particles[j].velx + p2_acelx*timestep
 
                 particles[i].vely = particles[i].vely + p1_acely * timestep
                 particles[j].vely = particles[j].vely + p2_acely * timestep
 
-    #            print(particles[j].velx, "\n", file=orig_stdout)
-     #           print(particles[j].velx, "\n", file=orig_stdout)
-
         for i in range(num_particles):
             print(particles[i].get_Posx(), particles[i].get_Posy())
             particles[i].cir.move(particles[i].velx, -particles[i].vely)
 
 
-        counter += 1
 
         time.sleep(timestep)
 
-    #win.getMouse()
     sys.stdout.close()
     win.close()
 

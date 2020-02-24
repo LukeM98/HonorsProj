@@ -61,7 +61,7 @@ def main():
 
         particles.append(Particle(int(str1[0]), Point(float(str1[1]), float(str1[2])), str2[0], win))
 
-    counter = 4+num_particles
+    counter = 4 + num_particles
 
     for step in range(int(num_timesteps)):
         if rest:
