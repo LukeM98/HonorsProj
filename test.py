@@ -14,7 +14,7 @@ duration = 20
 
 G_CONST = 1
 
-sig = .000001
+sig = .00001
 
 class Particle:
     rad = 0
@@ -61,9 +61,9 @@ def main():
     win = GraphWin("MyWindow", WIDTH, HEIGHT)
 
     colors = ['red', 'green', 'blue', 'yellow', 'black', 'white', 'orange', 'brown', 'purple', 'pink', 'teal', 'maroon', 'magenta', 'tan', 'gold', 'grey', 'cyan']
-    old_vels = [0,0,0,0]
-    old_ind = [0,0]
-    # error with velocity 4 and 13
+    old_velsx = []
+    old_velsy = []
+    ind_arr = []
     particles = []
     n = 0
     j = 0
@@ -96,13 +96,26 @@ def main():
     """
 
 
-    particles.append(Particle(40, 0, 0,
-                              Point(450, 450), colors[5],
+
+
+    particles.append(Particle(50,4, 0,
+                              Point(190, 200), colors[0],
+                              win, 300))
+
+    particles.append(Particle(RADIUS, 10, 0,
+                              Point(100, 200), colors[1],
                               win, 1))
 
-    particles.append(Particle(40, 0, 0,
-                              Point(44, 47), colors[0],
-                              win, 300000))
+    #particles.append(Particle(RADIUS, 0, 0,
+     #                         Point(60, 60), colors[0],
+      #                        win, 300000))
+
+    #particles.append(Particle(5, 0, 0,
+       #                       Point(450, 469), colors[1],
+        #                      win, 1))
+
+
+
 
 
 
@@ -115,6 +128,9 @@ def main():
     sleeper = .001
 
     for k in range(int(num_timesteps)):
+        old_velsx[:] = []
+        old_velsy[:] = []
+        ind_arr[:] = []
         for i in range(num_particles):  # collision detection with wall
             y1 = particles[i].get_Posy()
             x1 = particles[i].get_Posx()
@@ -144,7 +160,7 @@ def main():
                 col2 =False
 
                 if collision(x1, x2, y1, y2, particles[i].rad, particles[j].rad,0):
-                    print("BOOM", file=orig_stdout)
+                    print("BOOM DISTANCE APART IS: ", get_distance(x1,x2,y1,y2),"\n",file=orig_stdout)
                     counter+=1
                     col2=True
 
@@ -170,7 +186,7 @@ def main():
                     #print("",file= orig_stdout)
                 else:
                     col2= False
-                    print("no boom: ", get_distance(x1,x2,y1,y2), file=orig_stdout)
+                    #print("no boom: ", get_distance(x1,x2,y1,y2), file=orig_stdout)
 
                 c_sq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
                 x_dist = math.sqrt(c_sq - ((y1 - y2) * (y1 - y2)))
@@ -286,77 +302,124 @@ def main():
                 #print(x1+particles[i].velx, x2+particles[j].velx, y1+(-particles[i].vely), y2+(-particles[j].vely), file=orig_stdout)
 
                 if collision(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely), particles[j].rad, particles[i].rad, 1):
-                    print("FUTURE COLLISION, CURRENT X VELOCITY: ", particles[i].velx, "CURRENT Y VELOCITY", particles[i].vely, "FUTURE DISTANCE: ", get_distance(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely)) , "CURRENT DISTANCE: ", get_distance(x2, x1, y2, y1),file=orig_stdout)
+                    iteration = 0
+                    # ISSUE OCCURED WHEN PARTICLE WAS GOING SO FAST IT ENDED UP ON THE OTHER SIDE OF THE PARTICLE IT WOULD COLLIDE WITH. THIS WOULD THROW OFF THE DISTANCE FORMULA, MAKING THEM STILL INTERSECT OUTSIDE THEIR BORDERS
+                    while(get_distance(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely)) < particles[i].rad + particles[j].rad):
+                        print("FUTURE COLLISION, CURRENT X VELOCITY: ", particles[j].velx, particles[i].velx, "CURRENT Y VELOCITY", particles[i].vely,particles[j].vely, "FUTURE DISTANCE: ", get_distance(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely)) , "CURRENT DISTANCE: ", get_distance(x2, x1, y2, y1),file=orig_stdout)
 
-                    future_col = True
-                    """
-                    vel1= math.sqrt((particles[i].velx*particles[i].velx)+(particles[i].vely*particles[i].vely))
-                    vel2= math.sqrt((particles[j].velx*particles[j].velx)+(particles[j].vely*particles[j].vely))
+                        future_col = True
+                        if(iteration == 0):
+                            old_velsx.append(particles[i].velx)
+                            old_velsy.append(particles[i].vely)
+                            ind_arr.append(i)
 
-                    num1 = (particles[i].rad + particles[j].rad+particles[j].get_Posx()-particles[i].get_Posx())/(particles[i].velx-particles[j].velx)
-                    num2 = (particles[i].rad + particles[j].rad+particles[j].get_Posy()-particles[i].get_Posy())/(particles[i].vely-particles[j].vely)
-                    den1 = (particles[j].get_Posx()-particles[i].get_Posx())/(particles[i].velx-particles[j].velx)
-                    den2 = (particles[j].get_Posy()-particles[i].get_Posy())/(particles[i].vely-particles[j].vely)
+                            old_velsx.append(particles[j].velx)
+                            old_velsy.append(particles[j].vely)
+                            ind_arr.append(j)
 
-                    multiplier= abs(num1/den1)
-                    multiplier2= abs(num2/den2)
+                        overlap = (particles[i].rad+particles[j].rad) - get_distance(x1+particles[i].velx, x2+particles[j].velx, y1+(-particles[i].vely), y2+(-particles[j].vely))
+                        vel1 = math.sqrt((particles[i].velx*particles[i].velx)+(particles[i].vely * particles[i].vely))
+                        vel2 = math.sqrt((particles[j].velx*particles[j].velx)+(particles[j].vely * particles[j].vely))
 
-                    print(multiplier, " ", multiplier2, file=orig_stdout)
-                    old_vels[0] = particles[i].velx
-                    old_vels[1] = particles[i].vely
-                    old_vels[2] = particles[j].velx
-                    old_vels[3] = particles[j].vely
+                        totalvel = vel1+vel2
 
-                    old_ind[0] = i
-                    old_ind[1] = j
-                    particles[i].velx *= multiplier
-                    particles[j].velx *= multiplier
-                    particles[j].vely *= multiplier2
-                    particles[j].vely *= multiplier2
-                
-                    """
-                    old_vels[0] = particles[i].velx
-                    old_vels[1] = particles[i].vely
+                        vel1_rat = vel1/totalvel
+                        vel2_rat = vel2/totalvel
 
-                    old_vels[2] = particles[j].velx
-                    old_vels[3] = particles[j].vely
+                        print("overlap = ", overlap, file=orig_stdout)
+                        print("ratios = ", vel1_rat, vel2_rat, file=orig_stdout)
+                        #print("TOTAL VEL: ", totalvel, file=orig_stdout)
+                        #print("VEL1_RAT: ", vel1_rat, file=orig_stdout)
 
-                    overlap = (particles[i].rad+particles[j].rad) - get_distance(x1+particles[i].velx, x2+particles[j].velx, y1+(-particles[i].vely), y2+(-particles[j].vely))
-                    vel1 = math.sqrt((particles[i].velx*particles[i].velx)+(particles[i].vely * particles[i].vely))
-                    vel2 = math.sqrt((particles[j].velx*particles[j].velx)+(particles[j].vely * particles[j].vely))
+                        if particles[i].velx < 0: #apparently don't need for y since we use it to find the angle?
+                            dir1x = -1
+                        elif particles[i].velx > 0:
+                            dir1x = 1
+                        else:
+                            dir1x = 0
 
-                    totalvel = vel1+vel2
-                    vel1_rat = vel1/totalvel
-                    vel2_rat = vel2/totalvel
-                    print("TOTAL VEL: ", totalvel, file=orig_stdout)
-                    print("VEL1_RAT: ", vel1_rat, file=orig_stdout)
+                        if particles[j].velx < 0:
+                            dir2x = -1
+                        elif particles[j].velx > 0:
+                            dir2x = 1
+                        else:
+                            dir2x = 0
 
-                    vel1_ov = vel1 - (vel1_rat*overlap)
-                    vel2_ov = vel2 - (vel2_rat*overlap)
+                        if particles[i].vely < 0: #apparently don't need for y since we use it to find the angle?
+                            dir1y = -1
+                            #print("vel2_ov: ",  file=orig_stdout)
+                        elif particles[i].vely > 0:
+                            dir1y = 1
+                        else:
+                            dir1y = 0
 
-                    #print("Old velocity: ", vel1, file=orig_stdout)
-                    #print("New velocity: ", vel2_ov, file=orig_stdout)
+                        if particles[j].vely < 0:
+                            dir2y = -1
+                            #print("vel2_ov: ", file=orig_stdout)
+                        elif particles[j].vely > 0:
+                            dir2y = 1
+                        else:
+                            dir2y = 0
+                        """"
+                     # TODO TEST FOR Y VALUES, WHAT TO DO WHEN X AND Y ARE INVOLVED. EX: XS ARE BOTH POSITIVE BUT Y VELOCITIES ARE OPPOSITES
+                        if (dir1x == 1 and dir2x == 1) or (dir1x == -1 and dir2x == -1):
+                            if vel1 > vel2:
+                                vel1_ov = vel1 - overlap
+                                vel2_ov = vel2
+                            else:
+                                vel2_ov = vel2 - overlap
+                                vel1_ov = vel1
+                        elif (dir1y == 1 and dir2y == 1) or (dir2y == -1 and dir2y == -1):
+                            if vel1 > vel2:
+                                vel1_ov = vel1 - overlap
+                                vel2_ov = vel2
+                            else:
+                                #print("vel2_ov: ",  file=orig_stdout)
+                                vel2_ov = vel2 - overlap
+                                vel1_ov = vel1
+                        else:"""
+                        vel1_ov = vel1 - (vel1_rat * overlap)
+                        vel2_ov = vel2  - (vel2_rat * overlap)
 
-                    #TODO: The other scenarios in this conditional (including vely=0 and velx=0). Also need to do everything for particles 1
-                    #TODO: Multiple particles, take the smallest timestep and do this operation on it
+                        #print("Old velocity: ", vel1, file=orig_stdout)
+                        #print("New velocity: ", vel2_ov, file=orig_stdout)
 
-                    if particles[i].velx < 0 and particles[i].vely > 0:
+                    #TODO: The other scenarios in this conditional (including vely=0 and velx=0).
+                    #TODO: ISSUE WHERE NO COLLISION DETECTED IF BALL IS GOING SO FAST THAT IS SKIPS OVER THE OTHER BALL
+
+
+
+                       # if vel1 != abs(particles[i].velx) and vel1 != abs(particles[i].vely):
                         ang1 = math.asin(particles[i].vely/vel1)
-                        particles[i].velx = -(vel1_ov * math.cos(ang1))
-                        particles[i].vely = (vel1_ov * math.sin(ang1))
-                        #print("new x velocity: ", particles[i].velx, file=orig_stdout)
-                        #print("new y velocity: ", particles[i].vely, file=orig_stdout)
+                        particles[i].velx = dir1x * vel1_ov * math.cos(ang1)
+                        particles[i].vely = vel1_ov * math.sin(ang1)
+
+             #           elif vel1 == abs(particles[i].velx):
+
+                        #particles[i].velx = vel1_ov * dir1x
+                       # elif vel1 == abs(particles[i].vely):
+                        #particles[i].vely = vel1_ov *dir1y
 
 
+                        #if vel2 != abs(particles[j].velx) and vel2 != abs(particles[j].vely):
 
-                    if particles[j].vely < 0 and particles[j].velx > 0:
-                        ang2 = math.acos(particles[j].vely/vel2)
-                        particles[j].velx = vel2_ov * math.sin(ang2)
-                        particles[j].vely = vel2_ov * math.cos(ang2)
-                    elif particles[j].vely > 0 and particles[j].velx < 0:
-                        ang2 = math.asin(particles[j].vely/vel2)
-                        particles[j].velx = -(vel2_ov * math.cos(ang2))
+                        ang2 = math.asin(particles[j].vely / vel2)
+                        particles[j].velx = dir2x * vel2_ov * math.cos(ang2)
                         particles[j].vely = vel2_ov * math.sin(ang2)
+                        #elif vel2 == abs(particles[j].velx):
+
+                        #particles[j].velx = vel2_ov * dir2x
+                       # elif vel2 == abs(particles[j].vely):
+
+                        #    particles[j].vely = vel2_ov * dir2y
+
+
+                        print("x1: ", particles[i].get_Posx(), "y2: ", particles[i].get_Posy(), "vel2 here: ",
+                              particles[i].vely, file=orig_stdout)
+
+                        print("x2: ", particles[j].get_Posx(), "y2: ", particles[j].get_Posy(), "vel2 here: ", particles[j].vely, file=orig_stdout)
+                        print("NEW FUTURE DISTANCE = ", get_distance(x1+particles[i].velx, x2+particles[j].velx, y1+(-particles[i].vely), y2+(-particles[j].vely)), file=orig_stdout)
+                        iteration += 1
 
 
 
@@ -380,14 +443,15 @@ def main():
                     """
 
 
-                    old_ind[0] = i
-                    old_ind[1] = j
+                    #old_ind[0] = i
+                    #old_ind[1] = j
                    # print("",file=orig_stdout)
                 else:
                     future_col = False
                    # print("VELX: ", particles[i].velx, file=orig_stdout)
                     #print("VELY: ", particles[i].vely, file=orig_stdout)
                     #print("",file=orig_stdout)
+
 
         for i in range(num_particles):
             print(particles[i].get_Posx(), particles[i].get_Posy())
@@ -396,21 +460,25 @@ def main():
             particles[i].cir.move(particles[i].velx, -particles[i].vely)
 
 
-        if future_col:
-            particles[old_ind[0]].velx = old_vels[0]
-            particles[old_ind[0]].vely = old_vels[1]
+
+       # print(old_velsx, file=orig_stdout)
+        for q in range(len(ind_arr)):
+           # print("HERE", file=orig_stdout)
+           # print("Ind_arr[l] = ", q, file=orig_stdout)
+            particles[ind_arr[q]].velx = old_velsx[q]
+            particles[ind_arr[q]].vely = old_velsy[q]
 
             #print("old velx: ", old_vels[0], file=orig_stdout)
             #print("old vely: ", old_vels[1], file=orig_stdout)
 
 
-            particles[old_ind[1]].velx = old_vels[2]
-            particles[old_ind[1]].vely = old_vels[3]
+           # particles[old_ind[1]].velx = old_vels[2]
+           # particles[old_ind[1]].vely = old_vels[3]
             future_col = False
 
         if counter == 4:
             sleeper = 1
-        #time.sleep(.01)
+        time.sleep(.03)
 
     sys.stdout.close()
     win.close()
