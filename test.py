@@ -6,15 +6,15 @@ import sys
 
 WIDTH = 500
 HEIGHT = 500
-RADIUS = 5
+RADIUS = 7
 
-num_particles = 2
+num_particles = 8
 timestep = .03
 duration = 20
 
 G_CONST = 1
 
-sig = .00001
+sig = .1
 
 class Particle:
     rad = 0
@@ -76,8 +76,22 @@ def main():
     """
     for i in range(num_particles):
 
+        x = random.randint(0, WIDTH - RADIUS)
+        y = random.randint(0, HEIGHT - RADIUS)
+        rad = RADIUS
+        k=0
+
+        while( k < len(particles)):
+            if get_distance(particles[k].get_Posx(),x,particles[k].get_Posy(),y) <= particles[k].rad + rad:
+                x = random.randint(0, WIDTH - RADIUS)
+                y = random.randint(0, HEIGHT - RADIUS)
+                k = 0
+            else:
+                k+=1
+
+
         particles.append(Particle(RADIUS, random.randint(-11, 11), random.randint(-11, 11),
-                                  Point(random.randint(0, WIDTH - RADIUS), random.randint(0, HEIGHT - RADIUS)),
+                                  Point(x, y),
                                   colors[j], win, 1))
 
         while particles[i].velx == 0 and particles[i].vely == 0:
@@ -93,19 +107,41 @@ def main():
 
         if j >= len(colors):
             j = 0
-    """
+        """
 
 
 
 
-    particles.append(Particle(50,4, 0,
-                              Point(190, 200), colors[0],
-                              win, 300))
+    #particles.append(Particle(50,4, 0,
+     #                         Point(190, 200), colors[0],
+      #                        win, 300  ))
 
-    particles.append(Particle(RADIUS, 10, 0,
-                              Point(100, 200), colors[1],
+    particles.append(Particle(RADIUS, 5, 0,
+                              Point(25, 100), colors[0],
+                              win, 1))
+    particles.append(Particle(RADIUS, -5, 0,
+                              Point(85, 100), colors[1],
                               win, 1))
 
+    particles.append(Particle(RADIUS, 5, 0,
+                              Point(10, 100), colors[2],
+                              win, 1))
+    particles.append(Particle(RADIUS, -5, 0,
+                              Point(100, 100), colors[3],
+                              win, 1))
+
+    particles.append(Particle(RADIUS, 5, 0,
+                              Point(190, 100), colors[4],
+                              win, 1))
+    particles.append(Particle(RADIUS, -5, 0,
+                              Point(140, 100), colors[5],
+                              win, 1))
+    particles.append(Particle(RADIUS, 5, 0,
+                              Point(155, 100), colors[6],
+                              win, 1))
+    particles.append(Particle(RADIUS, 9, 0,
+                              Point(115, 100), colors[7],
+                              win, 1))
     #particles.append(Particle(RADIUS, 0, 0,
      #                         Point(60, 60), colors[0],
       #                        win, 300000))
@@ -115,12 +151,14 @@ def main():
         #                      win, 1))
 
 
-
-
-
-
     print(particles[0].rad, particles[0].get_Posx(), particles[0].get_Posy(), colors[0])
+    print(particles[1].rad, particles[1].get_Posx(), particles[1].get_Posy(), colors[1])
+    print(particles[0].rad, particles[0].get_Posx(), particles[0].get_Posy(), colors[2])
+    print(particles[1].rad, particles[1].get_Posx(), particles[1].get_Posy(), colors[3])
+    print(particles[0].rad, particles[0].get_Posx(), particles[0].get_Posy(), colors[4])
     print(particles[1].rad, particles[1].get_Posx(), particles[1].get_Posy(), colors[5])
+    print(particles[0].rad, particles[0].get_Posx(), particles[0].get_Posy(), colors[6])
+    print(particles[1].rad, particles[1].get_Posx(), particles[1].get_Posy(), colors[7])
 
 
     print()
@@ -160,7 +198,7 @@ def main():
                 col2 =False
 
                 if collision(x1, x2, y1, y2, particles[i].rad, particles[j].rad,0):
-                    print("BOOM DISTANCE APART IS: ", get_distance(x1,x2,y1,y2),"\n",file=orig_stdout)
+                    #print("BOOM DISTANCE APART IS: ", get_distance(x1,x2,y1,y2),"\n",file=orig_stdout)
                     counter+=1
                     col2=True
 
@@ -300,12 +338,13 @@ def main():
                 #Problem with timestep, i think it is due to the accelration outweighing the velocity
 
                 #print(x1+particles[i].velx, x2+particles[j].velx, y1+(-particles[i].vely), y2+(-particles[j].vely), file=orig_stdout)
+                #print("Checking: ", i, j, file=orig_stdout)
 
                 if collision(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely), particles[j].rad, particles[i].rad, 1):
                     iteration = 0
                     # ISSUE OCCURED WHEN PARTICLE WAS GOING SO FAST IT ENDED UP ON THE OTHER SIDE OF THE PARTICLE IT WOULD COLLIDE WITH. THIS WOULD THROW OFF THE DISTANCE FORMULA, MAKING THEM STILL INTERSECT OUTSIDE THEIR BORDERS
                     while(get_distance(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely)) < particles[i].rad + particles[j].rad):
-                        print("FUTURE COLLISION, CURRENT X VELOCITY: ", particles[j].velx, particles[i].velx, "CURRENT Y VELOCITY", particles[i].vely,particles[j].vely, "FUTURE DISTANCE: ", get_distance(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely)) , "CURRENT DISTANCE: ", get_distance(x2, x1, y2, y1),file=orig_stdout)
+                        #print("FUTURE COLLISION, CURRENT X VELOCITY: ", particles[j].velx, particles[i].velx, "CURRENT Y VELOCITY", particles[i].vely,particles[j].vely, "FUTURE DISTANCE: ", get_distance(x2+particles[j].velx, x1+particles[i].velx, y2+(-particles[j].vely), y1+(-particles[i].vely)) , "CURRENT DISTANCE: ", get_distance(x2, x1, y2, y1),file=orig_stdout)
 
                         future_col = True
                         if(iteration == 0):
@@ -326,8 +365,8 @@ def main():
                         vel1_rat = vel1/totalvel
                         vel2_rat = vel2/totalvel
 
-                        print("overlap = ", overlap, file=orig_stdout)
-                        print("ratios = ", vel1_rat, vel2_rat, file=orig_stdout)
+                       # print("overlap = ", overlap, file=orig_stdout)
+                       # print("ratios = ", vel1_rat, vel2_rat, file=orig_stdout)
                         #print("TOTAL VEL: ", totalvel, file=orig_stdout)
                         #print("VEL1_RAT: ", vel1_rat, file=orig_stdout)
 
@@ -414,11 +453,11 @@ def main():
                         #    particles[j].vely = vel2_ov * dir2y
 
 
-                        print("x1: ", particles[i].get_Posx(), "y2: ", particles[i].get_Posy(), "vel2 here: ",
-                              particles[i].vely, file=orig_stdout)
+                       # print("x1: ", particles[i].get_Posx(), "y2: ", particles[i].get_Posy(), "vel2 here: ",
+                             # particles[i].vely, file=orig_stdout)
 
-                        print("x2: ", particles[j].get_Posx(), "y2: ", particles[j].get_Posy(), "vel2 here: ", particles[j].vely, file=orig_stdout)
-                        print("NEW FUTURE DISTANCE = ", get_distance(x1+particles[i].velx, x2+particles[j].velx, y1+(-particles[i].vely), y2+(-particles[j].vely)), file=orig_stdout)
+                       # print("x2: ", particles[j].get_Posx(), "y2: ", particles[j].get_Posy(), "vel2 here: ", particles[j].vely, file=orig_stdout)
+                        #print("NEW FUTURE DISTANCE = ", get_distance(x1+particles[i].velx, x2+particles[j].velx, y1+(-particles[i].vely), y2+(-particles[j].vely)), file=orig_stdout)
                         iteration += 1
 
 
@@ -443,14 +482,8 @@ def main():
                     """
 
 
-                    #old_ind[0] = i
-                    #old_ind[1] = j
-                   # print("",file=orig_stdout)
-                else:
-                    future_col = False
-                   # print("VELX: ", particles[i].velx, file=orig_stdout)
-                    #print("VELY: ", particles[i].vely, file=orig_stdout)
-                    #print("",file=orig_stdout)
+
+
 
 
         for i in range(num_particles):
@@ -463,22 +496,12 @@ def main():
 
        # print(old_velsx, file=orig_stdout)
         for q in range(len(ind_arr)):
-           # print("HERE", file=orig_stdout)
-           # print("Ind_arr[l] = ", q, file=orig_stdout)
             particles[ind_arr[q]].velx = old_velsx[q]
             particles[ind_arr[q]].vely = old_velsy[q]
 
-            #print("old velx: ", old_vels[0], file=orig_stdout)
-            #print("old vely: ", old_vels[1], file=orig_stdout)
 
-
-           # particles[old_ind[1]].velx = old_vels[2]
-           # particles[old_ind[1]].vely = old_vels[3]
-            future_col = False
-
-        if counter == 4:
-            sleeper = 1
-        time.sleep(.03)
+        print(file=orig_stdout)
+        time.sleep(.1)
 
     sys.stdout.close()
     win.close()
