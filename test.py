@@ -12,7 +12,7 @@ timestep = .03
 # ALTERABLE VARIABLES
 RADIUS = 5 #RADIUS OF BALLS
 duration = 20 # DURATION OF PROGRAM
-num_particles = 25 # NUMBER OF PARTICLES
+num_particles = 10 # NUMBER OF PARTICLES
 G_CONST = 1 #Gravitational Constant
 co_frict = 0 #COEFFECIENT OF FRICTION
 # *********

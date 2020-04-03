@@ -1,0 +1,14 @@
+lucas@lucas-VirtualBox:~/Documents/LucasMartinHonors$ mpiexec -n 2 --oversubscribe python parallel.py
+RANK: 0 SUBPARTCILE VELX AND POSX =0 241
+
+RANK: 1 SUBPARTCILE VELX AND POSX =0 439
+
+[[<__main__.Particle instance at 0x7fcf04b05550>], [<__main__.Particle instance at 0x7fcf04b05640>]]
+[[<__main__.Particle instance at 0x7fcf04b05550>], [<__main__.Particle instance at 0x7fcf04b05640>]]
+RANK: 0 SUBPARTCILE VELX AND POSX =0 241
+
+RANK: 1 SUBPARTCILE VELX AND POSX =0 439
+
+[[<__main__.Particle instance at 0x7fcf04b05550>], [<__main__.Particle instance at 0x7fcf04b05640>]]
+[[<__main__.Particle instance at 0x7fcf04b05550>], [<__main__.Particle instance at 0x7fcf04b05640>]]
+

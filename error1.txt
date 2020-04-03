@@ -1,0 +1,15 @@
+
+lucas@lucas-VirtualBox:~/Documents/LucasMartinHonors$ mpiexec -n 2 --oversubscribe python parallel.py
+RANK: 0 SUBPARTCILE VELX AND POSX =0 140
+
+RANK: 1 SUBPARTCILE VELX AND POSX =0 128
+
+Traceback (most recent call last):
+  File "parallel.py", line 227, in <module>
+    main()
+  File "parallel.py", line 210, in main
+    fh.Write(str(new_particles[i].posx)+" "+str(new_particles[i].posy)+'\n')
+AttributeError: 'list' object has no attribute 'posx'
+
+
+
