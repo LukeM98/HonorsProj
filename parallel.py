@@ -17,7 +17,7 @@ timestep = .03
 # ALTERABLE VARIABLES
 RADIUS = 5 #RADIUS OF BALLS
 duration = 10 # DURATION OF PROGRAM
-num_particles = 100 # NUMBER OF PARTICLES
+num_particles = 10 # NUMBER OF PARTICLES
 G_CONST = 1 #Gravitational Constant
 co_frict = 0 #COEFFECIENT OF FRICTION
 # *********
@@ -168,7 +168,9 @@ def main():
     #WORKS WITH EVEN DISTRIBUTIONS OF PARTICLES RIGHT NOW
     for j in range(int(num_timesteps)):
 
+
         particles = comm.bcast(particles,root=0)
+
         sub_particles = [0] * blocksize
         tmp = startInd
 
@@ -194,9 +196,56 @@ def main():
             if y1 <= sub_particles[i].rad:
                 if sub_particles[i].vely > 0:
                     sub_particles[i].vely *= -1
+            """
+            curInd = startInd
+            for k in range(num_particles):
+                if k == curInd and k < startInd+blocksize:
+                    curInd+=1
+                    continue
+                else:
+                    test= 0
+            """
 
             sub_particles[i].posx += sub_particles[i].velx
             sub_particles[i].posy += -(sub_particles[i].vely)
+                    #TO DO COLLISION STUFF HERE
+
+        #LEFTOVERS DONE ON ROOT
+        if rank == 0:
+            leftoverInd = blocksize * size
+            for i in range(leftoverInd, num_particles):
+                y1 = particles[i].get_Posy()
+                x1 = particles[i].get_Posx()
+                if x1 >= WIDTH - particles[i].rad:
+                    if particles[i].velx > 0:
+                        particles[i].velx *= -1
+
+                if x1 <= particles[i].rad:
+                    if particles[i].velx < 0:
+                        particles[i].velx *= -1
+
+                if y1 >= HEIGHT - particles[i].rad:
+                    if particles[i].vely < 0:
+                        particles[i].vely *= -1
+
+                if y1 <= particles[i].rad:
+                    if particles[i].vely > 0:
+                        particles[i].vely *= -1
+
+                """
+                curInd = startInd
+                for k in range(num_particles):
+                    if k == curInd and k < startInd + blocksize:
+                        curInd += 1
+                        continue
+                 """
+                particles[i].posx += particles[i].velx
+                particles[i].posy += -(particles[i].vely)
+
+
+
+
+
 
 
 
@@ -207,13 +256,18 @@ def main():
         if rank == 0:
             rowInd = 0
             colInd = 0
-            for i in range(num_particles):
+            leftoverInd = blocksize*size
+            for i in range(blocksize*size):
+               # print(i)
                 particles[i] = new_particles[rowInd][colInd]
                 colInd +=1
                 if colInd >= blocksize:
                     colInd = 0
                     rowInd += 1
               #  print(particles[i].velx)
+                fh.Write(str(particles[i].posx) + " " + str(particles[i].posy) + '\n')
+
+            for i in range(leftoverInd,num_particles):
                 fh.Write(str(particles[i].posx) + " " + str(particles[i].posy) + '\n')
 
         comm.Barrier()
