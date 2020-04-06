@@ -17,7 +17,7 @@ timestep = .03
 # ALTERABLE VARIABLES
 RADIUS = 5 #RADIUS OF BALLS
 duration = 10 # DURATION OF PROGRAM
-num_particles = 10 # NUMBER OF PARTICLES
+num_particles = 112 # NUMBER OF PARTICLES
 G_CONST = 1 #Gravitational Constant
 co_frict = 0 #COEFFECIENT OF FRICTION
 # *********
@@ -105,7 +105,10 @@ def main():
         if os.path.exists("output.txt"):
             os.remove('output.txt')
 
-    fh = MPI.File.Open(comm,'output.txt', MPI.MODE_WRONLY|MPI.MODE_CREATE)
+   # fh = MPI.File.Open(comm,'output.txt', MPI.MODE_WRONLY|MPI.MODE_CREATE)
+    if rank ==0:    
+        fh = open('output.txt', 'w')
+     
     colors = ['red', 'green', 'blue', 'yellow', 'black', 'white', 'orange', 'brown', 'purple', 'pink', 'teal', 'maroon', 'magenta', 'tan', 'gold', 'grey', 'cyan']
     num_timesteps = duration / timestep
     counter = 0
@@ -119,9 +122,12 @@ def main():
         j = 0
         future_col = False
 
-        fh.Write(str(num_particles)+'\n')
-        fh.Write(str(num_timesteps)+'\n')
-        fh.Write('\n')
+        #string = str(num_particles)
+        fh.write(str(num_particles)+'\n')
+        fh.write(str(num_timesteps)+'\n')
+        #fh.Write(str(num_particles)+'\n')
+        #fh.Write(str(num_timesteps)+'\n')
+        fh.write('\n')
         collision_array = [[] for l in range(num_particles)]
         # print(collision_array, file=orig_stdout)
 
@@ -150,7 +156,7 @@ def main():
 
                 particles[i].vely = random.randint(-10, 10)
 
-            fh.Write(str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " + colors[j] + '\n')
+            fh.write(str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " + colors[j] + '\n')
             j += 1
 
             if j == len(colors):
@@ -159,7 +165,7 @@ def main():
             # radius, posx, posy, color, mass
 
 
-        fh.Write('\n')
+        fh.write('\n')
 
 
     blocksize = num_particles//size
@@ -265,10 +271,10 @@ def main():
                     colInd = 0
                     rowInd += 1
               #  print(particles[i].velx)
-                fh.Write(str(particles[i].posx) + " " + str(particles[i].posy) + '\n')
+                fh.write(str(particles[i].posx) + " " + str(particles[i].posy) + '\n')
 
             for i in range(leftoverInd,num_particles):
-                fh.Write(str(particles[i].posx) + " " + str(particles[i].posy) + '\n')
+                fh.write(str(particles[i].posx) + " " + str(particles[i].posy) + '\n')
 
         comm.Barrier()
         """
@@ -281,8 +287,8 @@ def main():
      # comm.scatter(particles, root= 0)
 
 
-
-    MPI.File.Close(fh)
+    if rank == 0:
+        fh.close()
 
 
 main()
