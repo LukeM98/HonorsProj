@@ -3,8 +3,7 @@ import time
 import keyboard
 
 
-WIDTH = 500
-HEIGHT = 500
+
 rest = 0
 speed = .03
 
@@ -47,21 +46,23 @@ def main():
     print("HOTKEYS:\n SPACEBAR to pause\n 1 to make speed slowest\n 2 to make speed slow\n 3 to make speed  normal")
     f = open("output.txt", "r")
     f1 = f.readlines()
+    WIDTH = int(f1[0])
+    HEIGHT = int(f1[1])
     win = GraphWin("MyWindow", WIDTH, HEIGHT)
 
-    num_particles = int(f1[0])
-    num_timesteps = float(f1[1])
+    num_particles = int(f1[2])
+    num_timesteps = float(f1[3])
 
     particles = []
 
     for i in range(num_particles):
-        string = f1[i+3]
+        string = f1[i+5]
         str1 = string.split(' ')
         str2 = str1[3].split('\n')
 
         particles.append(Particle(int(str1[0]), Point(float(str1[1]), float(str1[2])), str2[0], win))
 
-    counter = 4 + num_particles
+    counter = 6 + num_particles
 
     for step in range(int(num_timesteps)):
         if rest:

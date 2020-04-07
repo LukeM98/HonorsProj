@@ -9,17 +9,17 @@ from mpi4py import MPI
 
 
 #TODO STATIC FRICTION, MULTIWAY COLLISIONS
-WIDTH = 500
-HEIGHT = 500
+WIDTH = 400
+HEIGHT = 400
 timestep = .03
 
 # *********
 # ALTERABLE VARIABLES
 RADIUS = 5 #RADIUS OF BALLS
 duration = 10 # DURATION OF PROGRAM
-num_particles = 112 # NUMBER OF PARTICLES
+num_particles = 12 # NUMBER OF PARTICLES
 G_CONST = 1 #Gravitational Constant
-co_frict = 0 #COEFFECIENT OF FRICTION
+co_frict = .1#COEFFECIENT OF FRICTION
 # *********
 
 g_acel = 9.8
@@ -119,6 +119,8 @@ def main():
 
     num_timesteps = duration / timestep
     if rank == 0:
+        fh.write(str(WIDTH) + '\n')
+        fh.write(str(HEIGHT) + '\n')
         j = 0
         future_col = False
 
@@ -166,12 +168,11 @@ def main():
 
 
         fh.write('\n')
-
+    # END OF INITIALIZING STUFF
 
     blocksize = num_particles//size
     startInd= rank*blocksize
 
-    #WORKS WITH EVEN DISTRIBUTIONS OF PARTICLES RIGHT NOW
     for j in range(int(num_timesteps)):
 
 
@@ -182,7 +183,7 @@ def main():
 
         for i in range(blocksize):
             sub_particles[i] = particles[tmp]
-            tmp += 1
+            tmp += 1 #Index variable used above
 
         for i in range(blocksize):
             y1 = sub_particles[i].get_Posy()
@@ -202,7 +203,29 @@ def main():
             if y1 <= sub_particles[i].rad:
                 if sub_particles[i].vely > 0:
                     sub_particles[i].vely *= -1
-            """
+
+
+            vel1 = math.sqrt((sub_particles[i].velx * sub_particles[i].velx) + (sub_particles[i].vely * sub_particles[i].vely))
+
+            if sub_particles[i].velx < 0:  # apparently don't need for y since we use it to find the angle?
+                dir1x = -1
+            elif sub_particles[i].velx > 0:
+                dir1x = 1
+            else:
+                dir1x = 0
+
+            new_vel = vel1 - co_frict * g_acel * (timestep)
+
+            if new_vel <= 0:
+                sub_particles[i].velx = 0
+                sub_particles[i].vely = 0
+            else:
+                ang1 = math.asin(sub_particles[i].vely / vel1)
+                sub_particles[i].velx = math.cos(ang1) * new_vel * dir1x
+                sub_particles[i].vely = math.sin(ang1) * new_vel
+
+            #End Of Wall Collision and Friction
+            """ #TO DO COLLISION STUFF HERE
             curInd = startInd
             for k in range(num_particles):
                 if k == curInd and k < startInd+blocksize:
@@ -214,7 +237,7 @@ def main():
 
             sub_particles[i].posx += sub_particles[i].velx
             sub_particles[i].posy += -(sub_particles[i].vely)
-                    #TO DO COLLISION STUFF HERE
+
 
         #LEFTOVERS DONE ON ROOT
         if rank == 0:
@@ -238,13 +261,36 @@ def main():
                     if particles[i].vely > 0:
                         particles[i].vely *= -1
 
-                """
+                vel1 = math.sqrt((particles[i].velx * particles[i].velx) + (particles[i].vely * particles[i].vely))
+
+                if particles[i].velx < 0:  # apparently don't need for y since we use it to find the angle?
+                    dir1x = -1
+                elif particles[i].velx > 0:
+                    dir1x = 1
+                else:
+                    dir1x = 0
+
+                new_vel = vel1 - co_frict * g_acel * (timestep)
+
+                if new_vel <= 0:
+                    particles[i].velx = 0
+                    particles[i].vely = 0
+                else:
+                    ang1 = math.asin(particles[i].vely / vel1)
+                    particles[i].velx = math.cos(ang1) * new_vel * dir1x
+                    particles[i].vely = math.sin(ang1) * new_vel
+
+
+                """ 
+                #TO DO COLLISION STUFF HERE
                 curInd = startInd
                 for k in range(num_particles):
                     if k == curInd and k < startInd + blocksize:
                         curInd += 1
                         continue
-                 """
+                """
+
+
                 particles[i].posx += particles[i].velx
                 particles[i].posy += -(particles[i].vely)
 
@@ -276,7 +322,7 @@ def main():
             for i in range(leftoverInd,num_particles):
                 fh.write(str(particles[i].posx) + " " + str(particles[i].posy) + '\n')
 
-        comm.Barrier()
+        #comm.Barrier()
         """
         blocksize=comm.bcast(blocksize,root=0)
         print(blocksize)
