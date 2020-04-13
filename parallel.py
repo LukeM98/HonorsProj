@@ -1,3 +1,5 @@
+TESTING
+
 from graphics import *
 import time
 import math
@@ -12,21 +14,21 @@ from mpi4py import MPI
 
 #TODO STATIC FRICTION, MULTIWAY COLLISIONS
 
-timestep = .03
+timestep = 1
 
 # *********
 # ALTERABLE VARIABLES
 WIDTH = 500  #WIDTH AND HEIGHT PF DISPLAYING WINDOW, THESE TWO MUST BE
 HEIGHT = 500 # BIG ENOUGH TO FIT ALL THE BALLS OR ERROR WILL OCCUR
-RADIUS = 15 #RADIUS OF BALLS
-duration = 100 # DURATION OF PROGRAM
-num_particles = 10 # NUMBER OF PARTICLES
+RADIUS = 10 #RADIUS OF BALLS
+duration = 20 # DURATION OF PROGRAM
+num_particles = 50 # NUMBER OF PARTICLES
 G_CONST = 1 #Gravitational Constant
 co_frict = 0#COEFFECIENT OF FRICTION
 # *********
 
 g_acel = 9.8
-
+#make timestep relative to highest velocity. Multiple all velocoties by this new timestep.
 class Particle:
     rad = 0
     velx = 0
@@ -120,7 +122,8 @@ def main():
     #RANK 0 DOES ALL WRITING
 
 
-    num_timesteps = duration / timestep
+    num_timesteps = duration / .03
+
     if rank == 0:
         fh.write(str(WIDTH) + '\n')
         fh.write(str(HEIGHT) + '\n')
@@ -548,8 +551,8 @@ def main():
                 sub_particles[i].vely = min(future_collisiony, key=abs)
 
 
-            sub_particles[i].posx += sub_particles[i].velx
-            sub_particles[i].posy += -(sub_particles[i].vely)
+            sub_particles[i].posx += sub_particles[i].velx *timestep
+            sub_particles[i].posy += -(sub_particles[i].vely) * timestep
 
             if(future_collisionx):
                 sub_particles[i].velx = future_collisionx[0]
@@ -751,7 +754,141 @@ def main():
                     particles[i].vely = particles[i].vely + (p1_acely * timestep)
                     # particles[k].vely = particles[k].vely + (p2_acely * timestep)
 
+                future_collisionx = []
+                future_collisiony = []
+                valid_pos = [1] * blocksize
 
+
+                for l in range(num_particles):
+
+                    if l != i:
+
+                        # if valid_pos[i] == 0 and valid_pos[j] == 0:
+                        # print(particles[i].velx, particles[i].vely, particles[j].velx, particles[j].vely,file=orig_stdout)
+                        y2 = particles[l].get_Posy()
+                        x2 = particles[l].get_Posx()
+                        if collision(x2 + particles[l].velx, x1 + particles[i].velx, y2 + (-particles[l].vely),
+                                     y1 + (-particles[i].vely), particles[l].rad, particles[i].rad, 1) and (
+                                particles[i].velx != 0 or particles[i].vely != 0 or particles[l].velx != 0 or
+                                particles[l].vely != 0):
+                            # print("FUTURE COLLISION BETWEEN ", particles[l].color, sub_particles[i].color)
+                            # IN HERE ADJUST THE TWO BALLS AND CHECK THEM WITH EVERY OTHER BALL. IF THERE IS NO OVERLAP, THEN IT IS IN VALID SPOT.
+                            # IF THERE IS OVERLAP WITH OTHER BALLS, ADJUST BALL THAT IS NEWLY IN INVALID SPOT
+
+                            future_collisionx.append(particles[
+                                                         i].velx)  # puts velocity in that partciles velocity array, used to determine old velocity of particle after its collision
+                            future_collisiony.append(particles[i].vely)
+
+                            # if j >= startInd and j <= startInd + blocksize:
+                            #     future_collisionx[j].append(particles[j].velx)
+                            #     future_collisiony[j].append(particles[j].vely)
+                            #
+                            #
+                            sigma = 0
+                            iteration = 0  # prevents infinite loops
+
+                            # THIS, FOR MOST PART CHECKS FUTURE DETECTION, RARE MULTIWAY COLLISIONS WILL RESULT IN SOME OVERLAPPING
+                            while (get_distance(x2 + particles[l].velx, x1 + particles[i].velx,
+                                                y2 + (-particles[l].vely),
+                                                y1 + (-particles[i].vely)) < (
+                                           particles[i].rad + particles[l].rad)) and (iteration < 10):
+
+                                iteration += 1
+
+                                overlap = (particles[i].rad + particles[l].rad) - get_distance(
+                                    x1 + particles[i].velx,
+                                    x2 + particles[l].velx,
+                                    y1 + (-particles[i].vely),
+                                    y2 + (-particles[l].vely))
+                                vel1 = math.sqrt(
+                                    (particles[i].velx * particles[i].velx) + (
+                                                particles[i].vely * particles[i].vely))
+
+                                vel2 = math.sqrt(
+                                    (particles[l].velx * particles[l].velx) + (particles[l].vely * particles[l].vely))
+
+                                totalvel = vel1 + vel2
+
+                                if (totalvel != 0):
+                                    vel1_rat = vel1 / totalvel
+                                    vel2_rat = vel2 / totalvel
+                                else:
+                                    vel1_rat = 0
+                                    vel2_rat = 0
+
+                                if particles[
+                                    i].velx < 0:  # apparently don't need for y since we use it to find the angle?
+                                    dir1x = -1
+                                elif particles[i].velx > 0:
+                                    dir1x = 1
+                                else:
+                                    dir1x = 0
+
+                                if particles[l].velx < 0:
+                                    dir2x = -1
+                                elif particles[l].velx > 0:
+                                    dir2x = 1
+                                else:
+                                    dir2x = 0
+                                #
+                                vel1_ov = vel1 - (vel1_rat * overlap)
+                                vel2_ov = vel2 - (vel2_rat * overlap)
+
+                                # TODO: The other scenarios in this conditional (including vely=0 and velx=0).
+                                # TODO: ISSUE WHERE NO COLLISION DETECTED IF BALL IS GOING SO FAST THAT IS SKIPS OVER THE OTHER BALL
+                                # NEW IDEA: FIND COLLISION WITH SMALLEST TIME STEP, MAKE THAT THE NEW TIME STEP,
+                                if (vel1 != 0):
+                                    ang1 = math.asin(particles[i].vely / vel1)
+                                    particles[i].velx = dir1x * vel1_ov * math.cos(ang1)
+                                    particles[i].vely = vel1_ov * math.sin(ang1)
+
+                                if (vel2 != 0):
+                                    ang2 = math.asin(particles[l].vely / vel2)
+                                    particles[l].velx = dir2x * vel2_ov * math.cos(ang2)
+
+                                    particles[l].vely = vel2_ov * math.sin(ang2)
+
+                                # print("MEMORY OF INDEX PARTICLE 2", hex(id(particles[2])), "MEMORY OF SUB_PARTICLE AT 2 ", hex(id(sub_particles[2])), "\n\n")
+                                # iteration += 1
+
+                                # print("FUTURE COLLISION BETWEEN ", particles[i].color, particles[j].color,
+                                #       "CURRENT X VELOCITY: ",
+                                #       particles[j].velx, particles[i].velx,
+                                #       "CURRENT Y VELOCITY", particles[i].vely, particles[j].vely, "FUTURE DISTANCE: ",
+                                #       get_distance(x2 + particles[j].velx, x1 + particles[i].velx,
+                                #                    y2 + (-particles[j].vely),
+                                #                    y1 + (-particles[i].vely)), "CURRENT DISTANCE: ",
+                                #       get_distance(x2, x1, y2, y1), file=orig_stdout)
+                                sigma += .1
+
+                                future_collisionx.append(particles[i].velx)
+                                future_collisiony.append(particles[i].vely)
+
+                                # future_collisionx[j].append(particles[j].velx)
+                            # future_collisiony[j].append(particles[j].vely)
+                            #  valid_pos[j] = 1
+                            # valid_pos = update_positions(valid_pos,particles,i,j)
+
+                            # valid_pos[i] = 1
+
+                            # update_position(valid_pos, particles)
+                # if rank == 0:
+                #     print("0")
+                # elif rank == 1:
+                #     print("1")
+                # elif rank ==2:
+                #     print("2")
+
+                if (future_collisionx):
+                    particles[i].velx = min(future_collisionx, key=abs)
+                    particles[i].vely = min(future_collisiony, key=abs)
+
+                particles[i].posx += particles[i].velx
+                particles[i].posy += -(particles[i].vely)
+
+                if (future_collisionx):
+                    particles[i].velx = future_collisionx[0]
+                    particles[i].vely = future_collisiony[0]
                 # STOP
 
                 #UPDATE POSITION THEN CHANGE VELOCITIES BACK
