@@ -4,17 +4,17 @@ import math
 import random
 import sys
 #TODO STATIC FRICTION, MULTIWAY COLLISIONS
-WIDTH = 500
-HEIGHT = 500
+WIDTH = 540
+HEIGHT = 400
 timestep = .03
 
 # *********
 # ALTERABLE VARIABLES
-RADIUS = 5 #RADIUS OF BALLS
+RADIUS = 15 #RADIUS OF BALLS
 duration = 20 # DURATION OF PROGRAM
 num_particles = 12 # NUMBER OF PARTICLES
 G_CONST = 1 #Gravitational Constant
-co_frict = 0 #COEFFECIENT OF FRICTION
+co_frict = .1 #COEFFECIENT OF FRICTION
 # *********
 
 g_acel = 9.8
@@ -420,6 +420,8 @@ def main():
 
 
         # End of collision and gravity stuff
+
+
        # print(file=orig_stdout)
         future_collisionx= [[] for j in range(num_particles)]
         future_collisiony = [[] for j in range(num_particles)]
