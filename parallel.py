@@ -140,75 +140,75 @@ def main():
         fh.write(str(num_timesteps)+'\n')
         fh.write('\n')
 
-        # for i in range(num_particles):
-        #
-        #     x = random.randint(RADIUS, WIDTH - RADIUS)
-        #     y = random.randint(RADIUS, HEIGHT - RADIUS)
-        #     rad = RADIUS
-        #     k = 0
-        #
-        #     while (k < len(particles)):
-        #         if get_distance(particles[k].get_Posx(), x, particles[k].get_Posy(), y) <= particles[k].rad + rad:
-        #             x = random.randint(RADIUS, WIDTH - RADIUS)
-        #             y = random.randint(RADIUS, HEIGHT - RADIUS)
-        #             k = 0
-        #         else:
-        #             k += 1
-        #    # print(j, len(colors))
-        #     particles.append(Particle(RADIUS, random.randint(-10, 10), random.randint(-10, 10),
-        #                               x, y,
-        #                               colors[j],
-        #                               1))
-        #    # if j == 0:
-        #     #    particles[0].velx = 0;
-        #      #   particles[0].vely = 0;
-        #
-        #     while particles[i].velx == 0 and particles[i].vely == 0:
-        #         particles[i].velx = random.randint(-10, 10)
-        #
-        #         particles[i].vely = random.randint(-10, 10)
-        #
-        #     fh.write(str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " + colors[j] + '\n')
-        #     j += 1
-        #
-        #     if j == len(colors):
-        #         j = 0
+        for i in range(num_particles):
+
+            x = random.randint(RADIUS, WIDTH - RADIUS)
+            y = random.randint(RADIUS, HEIGHT - RADIUS)
+            rad = RADIUS
+            k = 0
+
+            while (k < len(particles)):
+                if get_distance(particles[k].get_Posx(), x, particles[k].get_Posy(), y) <= particles[k].rad + rad:
+                    x = random.randint(RADIUS, WIDTH - RADIUS)
+                    y = random.randint(RADIUS, HEIGHT - RADIUS)
+                    k = 0
+                else:
+                    k += 1
+           # print(j, len(colors))
+            particles.append(Particle(RADIUS, random.randint(-10, 10), random.randint(-10, 10),
+                                      x, y,
+                                      colors[j],
+                                      1))
+           # if j == 0:
+            #    particles[0].velx = 0;
+             #   particles[0].vely = 0;
+
+            while particles[i].velx == 0 and particles[i].vely == 0:
+                particles[i].velx = random.randint(-10, 10)
+
+                particles[i].vely = random.randint(-10, 10)
+
+            fh.write(str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " + colors[j] + '\n')
+            j += 1
+
+            if j == len(colors):
+                j = 0
 
             # radius, posx, posy, color, mass
 
 
 
-        particles.append(Particle(RADIUS, 0, 0,
-                                 350, 363,
-                                 colors[0],
-                                 1))
-
-
-
-
-        particles.append(Particle(RADIUS, 0, 0,
-                                 250, 450,
-                                 colors[1],
-                                 1))
-
-        particles.append(Particle(100, 0, 0,
-                                  110, 120,
-                                  colors[2],
-                                  100000))
-
-
-        particles.append(Particle(RADIUS, 0, 0,
-                                 300, 250,
-                                 colors[3],
-                                 1))
-        fh.write(str(particles[0].rad) + " " + str(particles[0].get_Posx()) + " " + str(particles[0].get_Posy()) + " " +
-                 colors[0] + '\n')
-        fh.write(str(particles[1].rad) + " " + str(particles[1].get_Posx()) + " " + str(particles[1].get_Posy()) + " " +
-                 colors[1] + '\n')
-        fh.write(str(particles[2].rad) + " " + str(particles[2].get_Posx()) + " " + str(particles[2].get_Posy()) + " " +
-                  colors[2] + '\n')
-        fh.write(str(particles[3].rad) + " " + str(particles[3].get_Posx()) + " " + str(particles[3].get_Posy()) + " " +
-                 colors[3] + '\n')
+        # particles.append(Particle(RADIUS, 0, 0,
+        #                          350, 363,
+        #                          colors[0],
+        #                          1))
+        #
+        #
+        #
+        #
+        # particles.append(Particle(RADIUS, 0, 0,
+        #                          250, 450,
+        #                          colors[1],
+        #                          1))
+        #
+        # particles.append(Particle(100, 0, 0,
+        #                           110, 120,
+        #                           colors[2],
+        #                           100000))
+        #
+        #
+        # particles.append(Particle(RADIUS, 0, 0,
+        #                          300, 250,
+        #                          colors[3],
+        #                          1))
+        # fh.write(str(particles[0].rad) + " " + str(particles[0].get_Posx()) + " " + str(particles[0].get_Posy()) + " " +
+        #          colors[0] + '\n')
+        # fh.write(str(particles[1].rad) + " " + str(particles[1].get_Posx()) + " " + str(particles[1].get_Posy()) + " " +
+        #          colors[1] + '\n')
+        # fh.write(str(particles[2].rad) + " " + str(particles[2].get_Posx()) + " " + str(particles[2].get_Posy()) + " " +
+        #           colors[2] + '\n')
+        # fh.write(str(particles[3].rad) + " " + str(particles[3].get_Posx()) + " " + str(particles[3].get_Posy()) + " " +
+        #          colors[3] + '\n')
 
         fh.write('\n')
     # END OF INITIALIZING STUFF
@@ -230,19 +230,19 @@ def main():
                 max_vel = sub_particles[i].vel()
             tmp += 1 #Index variable used above
 
-        # max_vels = comm.gather(max_vel, root=0)
-        # global timestep_rat
-        # if rank == 0:
-        #     maximum = max(max_vels)
-        #   #  print(maximum)
-        #     if maximum > 10:
-        #
-        #         timestep_rat= 10 / maximum
-        #        # print(round(timestep *timestep_rat,2))
-        #
-        # timestep_rat = comm.bcast(timestep_rat,root=0)
+        max_vels = comm.gather(max_vel, root=0)
+        global timestep_rat
+        if rank == 0:
+            maximum = max(max_vels)
+          #  print(maximum)
+            if maximum > 10:
 
-       # print("RANK = ", rank, timestep_rat)
+                timestep_rat= 10 / maximum
+               # print(round(timestep *timestep_rat,2))
+
+        timestep_rat = comm.bcast(timestep_rat,root=0)
+
+        print("RANK = ", rank, timestep_rat)
 
         for i in range(blocksize):
             y1 = sub_particles[i].get_Posy()
