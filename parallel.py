@@ -16,11 +16,11 @@ timestep = .03
 
 # *********
 # ALTERABLE VARIABLES
-WIDTH = 400  # WIDTH AND HEIGHT PF DISPLAYING WINDOW, THESE TWO MUST BE
-HEIGHT = 400  # BIG ENOUGH TO FIT ALL THE BALLS OR ERROR WILL OCCUR
+WIDTH = 500  # WIDTH AND HEIGHT PF DISPLAYING WINDOW, THESE TWO MUST BE
+HEIGHT = 500  # BIG ENOUGH TO FIT ALL THE BALLS OR ERROR WILL OCCUR
 RADIUS = 10  # RADIUS OF BALLS
-duration = 20  # DURATION OF PROGRAM
-num_particles = 4  # NUMBER OF PARTICLES
+duration = 50  # DURATION OF PROGRAM
+num_particles = 4 # NUMBER OF PARTICLES
 G_CONST = 1  # Gravitational Constant
 co_frict = 0  # COEFFECIENT OF FRICTION
 SPEED_RANGE = [-5, 5]  # Range of Speed particles start out with, first number must be less than second
@@ -135,7 +135,7 @@ def main():
         fh.write(str(num_particles) + '\n')
         fh.write(str(num_timesteps) + '\n')
         fh.write('\n')
-
+        #
         # for i in range(num_particles):
         #
         #     x = random.randint(RADIUS, WIDTH - RADIUS)
@@ -175,6 +175,11 @@ def main():
 
             # radius, posx, posy, color, mass
 
+        particles.append(Particle(100, 0, 0,
+                                  110, 120,
+                                  colors[0],
+                                  100000))
+
         particles.append(Particle(RADIUS, 0, 0,
                                  350, 363,
                                  colors[1],
@@ -186,15 +191,13 @@ def main():
                                  colors[2],
                                  1))
 
-        particles.append(Particle(100, 0, 0,
-                                  110, 120,
-                                  colors[0],
-                                  100000))
 
-        particles.append(Particle(RADIUS, 6, 0,
+        particles.append(Particle(RADIUS, 0, 0,
                                  300, 250,
                                  colors[3],
                                  1))
+
+
         fh.write(str(particles[0].rad) + " " + str(particles[0].get_Posx()) + " " + str(particles[0].get_Posy()) + " " +
                  colors[0] + '\n')
         fh.write(str(particles[1].rad) + " " + str(particles[1].get_Posx()) + " " + str(particles[1].get_Posy()) + " " +
@@ -300,7 +303,7 @@ def main():
 
                                     vel1x = u1[0] * (mass1 - mass2) / (mass1 + mass2) + u2[0] * 2 * mass2 / (
                                             mass1 + mass2)
-                                    vel2x = u2[0] * (mass2 - mass1) / (mass1 + mass2) + u1[0] * 2 * mass2 / (
+                                    vel2x = u2[0] * (mass2 - mass1) / (mass1 + mass2) + u1[0] * 2 * mass1/ (
                                             mass1 + mass2)
                                     vel1y = u1[1]
                                     vel2y = u2[1]
@@ -330,105 +333,230 @@ def main():
                             # print("RANK,", rank, "RECEIVED", sub_particles[i].color, particles[k].color, "Iteration = ", j, '\n' )
                             # print("RECEIVED Second Thing")
                     # GRAVITY STARTS HERE
+                    if startInd + i < k:
+                        c_sq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+                        x_dist = math.sqrt(c_sq - ((y1 - y2) * (y1 - y2)))
+                        y_dist = math.sqrt(c_sq - ((x1 - x2) * (x1 - x2)))
 
-                    c_sq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
-                    x_dist = math.sqrt(c_sq - ((y1 - y2) * (y1 - y2)))
-                    y_dist = math.sqrt(c_sq - ((x1 - x2) * (x1 - x2)))
+                        distance = math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
 
-                    distance = math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+                        force_grav = (G_CONST * sub_particles[i].mass * particles[k].mass) / (distance * distance)
 
-                    force_grav = (G_CONST * sub_particles[i].mass * particles[k].mass) / (distance * distance)
+                        p1_acel = force_grav / sub_particles[i].mass
+                        p2_acel = force_grav / particles[k].mass
 
-                    p1_acel = force_grav / sub_particles[i].mass
-                    p2_acel = force_grav / particles[k].mass
-
-                    p1_acelx = 0
-                    p2_acely = 0
-                    p1_acely = 0
-                    p2_acelx = 0
-
-                    if x1 > x2 and y1 < y2:  # REPEAT THIS FOR OTHER 3 SCENARIOS                    #p1_acel = - p1_acel
-
-                        deg1 = math.acos(y_dist / distance)
-                        deg2 = math.acos(x_dist / distance)
-
-                        p1_acelx = (math.sin(deg1)) * p1_acel
-                        p1_acely = (math.cos(deg1)) * p1_acel
-
-                        p2_acelx = (math.cos(deg2)) * p2_acel
-                        p2_acely = (math.sin(deg2)) * p2_acel
-
-                        p1_acelx = -p1_acelx
-                        p1_acely = -p1_acely
-
-                    elif x1 < x2 and y1 < y2:
-
-                        # p2_acel = -p2_acel
-
-                        deg1 = math.acos(y_dist / distance)
-                        deg2 = math.acos(x_dist / distance)
-
-                        p1_acelx = (math.sin(deg1)) * p1_acel
-                        p1_acely = (math.cos(deg1)) * p1_acel
-
-                        p2_acelx = (math.cos(deg2)) * p2_acel
-                        p2_acely = (math.sin(deg2)) * p2_acel
-
-                        p2_acelx = -p2_acelx
-                        p1_acely = -p1_acely
-                    # print("here2",file=orig_stdout)
-                    elif x1 > x2 and y1 > y2:
-                        deg1 = math.asin(y_dist / distance)
-                        deg2 = math.asin(x_dist / distance)
-
-                        p1_acely = (math.sin(deg1)) * p1_acel
-                        p1_acelx = (math.cos(deg1)) * p1_acel
-
-                        p2_acely = (math.cos(deg2)) * p2_acel
-                        p2_acelx = (math.sin(deg2)) * p2_acel
-                        # print("here", file=orig_stdout)
-
-                        p2_acely = -p2_acely
-                        p1_acelx = - p1_acelx
-
-                    elif x1 < x2 and y1 > y2:
-                        deg1 = math.asin(y_dist / distance)
-                        deg2 = math.asin(x_dist / distance)
-
-                        p1_acely = (math.sin(deg1)) * p1_acel
-                        p1_acelx = (math.cos(deg1)) * p1_acel
-
-                        p2_acely = (math.cos(deg2)) * p2_acel
-                        p2_acelx = (math.sin(deg2)) * p2_acel
-
-                        p2_acelx = -p2_acelx
-                        p2_acely = -p2_acely
-                    elif x1 == x2 and y1 > y2:
                         p1_acelx = 0
-                        p2_acelx = 0
-                        p2_acely = -p2_acel
-                        p1_acely = p1_acel
-                    elif x1 == x2 and y1 < y2:
-                        p1_acelx = 0
-                        p2_acelx = 0
-                        p2_acely = p2_acel
-                        p1_acely = -p1_acel
-                    elif x1 > x2 and y1 == y2:
-                        p1_acelx = -p1_acel
-                        p2_acelx = p2_acel
-                        p1_acely = 0
                         p2_acely = 0
-                    elif x1 < x2 and y1 == y2:
-                        p1_acelx = p1_acel
-                        p2_acelx = -p2_acel
                         p1_acely = 0
-                        p2_acely = 0
+                        p2_acelx = 0
 
-                    sub_particles[i].velx = sub_particles[i].velx + (p1_acelx * timestep)
-                    particles[k].velx = particles[k].velx + (p2_acelx * timestep)
+                        if x1 > x2 and y1 < y2:  # REPEAT THIS FOR OTHER 3 SCENARIOS                    #p1_acel = - p1_acel
 
-                    sub_particles[i].vely = sub_particles[i].vely + (p1_acely * timestep)
-                    particles[k].vely = particles[k].vely + (p2_acely * timestep)
+                            deg1 = math.acos(y_dist / distance)
+                            deg2 = math.acos(x_dist / distance)
+
+                            p1_acelx = (math.sin(deg1)) * p1_acel
+                            p1_acely = (math.cos(deg1)) * p1_acel
+
+                            p2_acelx = (math.cos(deg2)) * p2_acel
+                            p2_acely = (math.sin(deg2)) * p2_acel
+
+                            p1_acelx = -p1_acelx
+                            p1_acely = -p1_acely
+
+                        elif x1 < x2 and y1 < y2:
+
+                            # p2_acel = -p2_acel
+
+                            deg1 = math.acos(y_dist / distance)
+                            deg2 = math.acos(x_dist / distance)
+
+                            p1_acelx = (math.sin(deg1)) * p1_acel
+                            p1_acely = (math.cos(deg1)) * p1_acel
+
+                            p2_acelx = (math.cos(deg2)) * p2_acel
+                            p2_acely = (math.sin(deg2)) * p2_acel
+
+                            p2_acelx = -p2_acelx
+                            p1_acely = -p1_acely
+                        # print("here2",file=orig_stdout)
+                        elif x1 > x2 and y1 > y2:
+                            deg1 = math.asin(y_dist / distance)
+                            deg2 = math.asin(x_dist / distance)
+
+                            p1_acely = (math.sin(deg1)) * p1_acel
+                            p1_acelx = (math.cos(deg1)) * p1_acel
+
+                            p2_acely = (math.cos(deg2)) * p2_acel
+                            p2_acelx = (math.sin(deg2)) * p2_acel
+                            # print("here", file=orig_stdout)
+
+                            p2_acely = -p2_acely
+                            p1_acelx = - p1_acelx
+
+                        elif x1 < x2 and y1 > y2:
+                            deg1 = math.asin(y_dist / distance)
+                            deg2 = math.asin(x_dist / distance)
+
+                            p1_acely = (math.sin(deg1)) * p1_acel
+                            p1_acelx = (math.cos(deg1)) * p1_acel
+
+                            p2_acely = (math.cos(deg2)) * p2_acel
+                            p2_acelx = (math.sin(deg2)) * p2_acel
+
+                            p2_acelx = -p2_acelx
+                            p2_acely = -p2_acely
+                        elif x1 == x2 and y1 > y2:
+                            p1_acelx = 0
+                            p2_acelx = 0
+                            p2_acely = -p2_acel
+                            p1_acely = p1_acel
+                        elif x1 == x2 and y1 < y2:
+                            p1_acelx = 0
+                            p2_acelx = 0
+                            p2_acely = p2_acel
+                            p1_acely = -p1_acel
+                        elif x1 > x2 and y1 == y2:
+                            p1_acelx = -p1_acel
+                            p2_acelx = p2_acel
+                            p1_acely = 0
+                            p2_acely = 0
+                        elif x1 < x2 and y1 == y2:
+                            p1_acelx = p1_acel
+                            p2_acelx = -p2_acel
+                            p1_acely = 0
+                            p2_acely = 0
+
+                        gforce1x = p1_acelx*timestep
+                        gforce1y=p1_acely*timestep
+
+                        gforce2x = p2_acelx*timestep
+                        gforce2y = p2_acely*timestep
+
+                        sub_particles[i].velx += gforce1x
+                        #particles[k].velx += gforce2x
+
+                        sub_particles[i].vely += gforce1y
+                        #particles[k].vely += gforce2y
+                        if k < startInd + blocksize:
+                            sub_particles[k - startInd].velx += gforce2x
+                            sub_particles[k-startInd].vely += gforce2y
+                        else:
+                           # print("RANK", rank, "SENDING ", particles[k].color, "and", sub_particles[i].color, "to", k//blocksize, "Iteration = ", j)
+                            comm.isend(gforce2x, k // blocksize, tag=k + num_particles)
+                            comm.isend(gforce2y, k // blocksize, tag=k + num_particles*2)
+
+                           # comm.isend(gforce1, k // blocksize, tag=-(i + startInd))
+                    else:
+                        if k < startInd or k >= startInd + blocksize:
+                            # print("WAITING FOR THING. MY RANK = ", rank,"EXPECTED FROM ", k//blocksize, "COLORS: ", sub_particles[i].color, particles[k].color, "Iteration ", j)
+                            gforce1x = comm.recv(source=k // blocksize, tag=num_particles+i + startInd)
+                            gforce1y = comm.recv(source=k // blocksize, tag=num_particles*2 + i + startInd)
+                            sub_particles[i].velx += gforce1x
+                            # particles[k].velx += gforce2
+
+                            sub_particles[i].vely += gforce1y
+                            # print("Received First thing")
+                            #gforce2 = comm.recv(source=k // blocksize, tag=-(k))
+
+                    # c_sq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+                    # x_dist = math.sqrt(c_sq - ((y1 - y2) * (y1 - y2)))
+                    # y_dist = math.sqrt(c_sq - ((x1 - x2) * (x1 - x2)))
+                    #
+                    # distance = math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+                    #
+                    # force_grav = (G_CONST * sub_particles[i].mass * particles[k].mass) / (distance * distance)
+                    #
+                    # p1_acel = force_grav / sub_particles[i].mass
+                    # p2_acel = force_grav / particles[k].mass
+                    #
+                    # p1_acelx = 0
+                    # p2_acely = 0
+                    # p1_acely = 0
+                    # p2_acelx = 0
+                    #
+                    # if x1 > x2 and y1 < y2:  # REPEAT THIS FOR OTHER 3 SCENARIOS                    #p1_acel = - p1_acel
+                    #
+                    #     deg1 = math.acos(y_dist / distance)
+                    #     deg2 = math.acos(x_dist / distance)
+                    #
+                    #     p1_acelx = (math.sin(deg1)) * p1_acel
+                    #     p1_acely = (math.cos(deg1)) * p1_acel
+                    #
+                    #     p2_acelx = (math.cos(deg2)) * p2_acel
+                    #     p2_acely = (math.sin(deg2)) * p2_acel
+                    #
+                    #     p1_acelx = -p1_acelx
+                    #     p1_acely = -p1_acely
+                    #
+                    # elif x1 < x2 and y1 < y2:
+                    #
+                    #     # p2_acel = -p2_acel
+                    #
+                    #     deg1 = math.acos(y_dist / distance)
+                    #     deg2 = math.acos(x_dist / distance)
+                    #
+                    #     p1_acelx = (math.sin(deg1)) * p1_acel
+                    #     p1_acely = (math.cos(deg1)) * p1_acel
+                    #
+                    #     p2_acelx = (math.cos(deg2)) * p2_acel
+                    #     p2_acely = (math.sin(deg2)) * p2_acel
+                    #
+                    #     p2_acelx = -p2_acelx
+                    #     p1_acely = -p1_acely
+                    # # print("here2",file=orig_stdout)
+                    # elif x1 > x2 and y1 > y2:
+                    #     deg1 = math.asin(y_dist / distance)
+                    #     deg2 = math.asin(x_dist / distance)
+                    #
+                    #     p1_acely = (math.sin(deg1)) * p1_acel
+                    #     p1_acelx = (math.cos(deg1)) * p1_acel
+                    #
+                    #     p2_acely = (math.cos(deg2)) * p2_acel
+                    #     p2_acelx = (math.sin(deg2)) * p2_acel
+                    #     # print("here", file=orig_stdout)
+                    #
+                    #     p2_acely = -p2_acely
+                    #     p1_acelx = - p1_acelx
+                    #
+                    # elif x1 < x2 and y1 > y2:
+                    #     deg1 = math.asin(y_dist / distance)
+                    #     deg2 = math.asin(x_dist / distance)
+                    #
+                    #     p1_acely = (math.sin(deg1)) * p1_acel
+                    #     p1_acelx = (math.cos(deg1)) * p1_acel
+                    #
+                    #     p2_acely = (math.cos(deg2)) * p2_acel
+                    #     p2_acelx = (math.sin(deg2)) * p2_acel
+                    #
+                    #     p2_acelx = -p2_acelx
+                    #     p2_acely = -p2_acely
+                    # elif x1 == x2 and y1 > y2:
+                    #     p1_acelx = 0
+                    #     p2_acelx = 0
+                    #     p2_acely = -p2_acel
+                    #     p1_acely = p1_acel
+                    # elif x1 == x2 and y1 < y2:
+                    #     p1_acelx = 0
+                    #     p2_acelx = 0
+                    #     p2_acely = p2_acel
+                    #     p1_acely = -p1_acel
+                    # elif x1 > x2 and y1 == y2:
+                    #     p1_acelx = -p1_acel
+                    #     p2_acelx = p2_acel
+                    #     p1_acely = 0
+                    #     p2_acely = 0
+                    # elif x1 < x2 and y1 == y2:
+                    #     p1_acelx = p1_acel
+                    #     p2_acelx = -p2_acel
+                    #     p1_acely = 0
+                    #     p2_acely = 0
+                    #
+                    # sub_particles[i].velx = sub_particles[i].velx + (p1_acelx * timestep)
+                    # particles[k].velx = particles[k].velx + (p2_acelx * timestep)
+                    #
+                    # sub_particles[i].vely = sub_particles[i].vely + (p1_acely * timestep)
+                    # particles[k].vely = particles[k].vely + (p2_acely * timestep)
                 # GRAVITY ENDS HERE
                 """ #TO DO COLLISION STUFF HERE
             curInd = startInd
