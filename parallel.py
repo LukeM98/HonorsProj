@@ -21,9 +21,9 @@ WIDTH = 500  #WIDTH AND HEIGHT PF DISPLAYING WINDOW, THESE TWO MUST BE
 HEIGHT = 500 # BIG ENOUGH TO FIT ALL THE BALLS OR ERROR WILL OCCUR
 RADIUS = 10 #RADIUS OF BALLS
 duration = 20 # DURATION OF PROGRAM
-num_particles = 50 # NUMBER OF PARTICLES
+num_particles = 4 # NUMBER OF PARTICLES
 G_CONST = 1 #Gravitational Constant
-co_frict = .1#COEFFECIENT OF FRICTION
+co_frict = 0#COEFFECIENT OF FRICTION
 # *********
 
 g_acel = 9.8
@@ -140,75 +140,75 @@ def main():
         fh.write(str(num_timesteps)+'\n')
         fh.write('\n')
 
-        for i in range(num_particles):
-
-            x = random.randint(RADIUS, WIDTH - RADIUS)
-            y = random.randint(RADIUS, HEIGHT - RADIUS)
-            rad = RADIUS
-            k = 0
-
-            while (k < len(particles)):
-                if get_distance(particles[k].get_Posx(), x, particles[k].get_Posy(), y) <= particles[k].rad + rad:
-                    x = random.randint(RADIUS, WIDTH - RADIUS)
-                    y = random.randint(RADIUS, HEIGHT - RADIUS)
-                    k = 0
-                else:
-                    k += 1
-           # print(j, len(colors))
-            particles.append(Particle(RADIUS, random.randint(-10, 10), random.randint(-10, 10),
-                                      x, y,
-                                      colors[j],
-                                      1))
-           # if j == 0:
-            #    particles[0].velx = 0;
-             #   particles[0].vely = 0;
-
-            while particles[i].velx == 0 and particles[i].vely == 0:
-                particles[i].velx = random.randint(-10, 10)
-
-                particles[i].vely = random.randint(-10, 10)
-
-            fh.write(str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " + colors[j] + '\n')
-            j += 1
-
-            if j == len(colors):
-                j = 0
+        # for i in range(num_particles):
+        #
+        #     x = random.randint(RADIUS, WIDTH - RADIUS)
+        #     y = random.randint(RADIUS, HEIGHT - RADIUS)
+        #     rad = RADIUS
+        #     k = 0
+        #
+        #     while (k < len(particles)):
+        #         if get_distance(particles[k].get_Posx(), x, particles[k].get_Posy(), y) <= particles[k].rad + rad:
+        #             x = random.randint(RADIUS, WIDTH - RADIUS)
+        #             y = random.randint(RADIUS, HEIGHT - RADIUS)
+        #             k = 0
+        #         else:
+        #             k += 1
+        #    # print(j, len(colors))
+        #     particles.append(Particle(RADIUS, random.randint(-10, 10), random.randint(-10, 10),
+        #                               x, y,
+        #                               colors[j],
+        #                               1))
+        #    # if j == 0:
+        #     #    particles[0].velx = 0;
+        #      #   particles[0].vely = 0;
+        #
+        #     while particles[i].velx == 0 and particles[i].vely == 0:
+        #         particles[i].velx = random.randint(-10, 10)
+        #
+        #         particles[i].vely = random.randint(-10, 10)
+        #
+        #     fh.write(str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " + colors[j] + '\n')
+        #     j += 1
+        #
+        #     if j == len(colors):
+        #         j = 0
 
             # radius, posx, posy, color, mass
 
 
 
-        # particles.append(Particle(RADIUS, 0, 0,
-        #                          350, 363,
-        #                          colors[1],
-        #                          1))
-        #
+        particles.append(Particle(RADIUS, 0, 0,
+                                 350, 363,
+                                 colors[0],
+                                 1))
 
 
 
-        # particles.append(Particle(RADIUS, 0, 0,
-        #                          250, 450,
-        #                          colors[2],
-        #                          1))
 
-        # particles.append(Particle(100, 0, 0,
-        #                           110, 120,
-        #                           colors[0],
-        #                           100000))
+        particles.append(Particle(RADIUS, 0, 0,
+                                 250, 450,
+                                 colors[1],
+                                 1))
+
+        particles.append(Particle(100, 0, 0,
+                                  110, 120,
+                                  colors[2],
+                                  100000))
 
 
-        # particles.append(Particle(RADIUS, 6, 0,
-        #                          300, 250,
-        #                          colors[3],
-        #                          1))
-        # fh.write(str(particles[0].rad) + " " + str(particles[0].get_Posx()) + " " + str(particles[0].get_Posy()) + " " +
-        #          colors[0] + '\n')
-        # fh.write(str(particles[1].rad) + " " + str(particles[1].get_Posx()) + " " + str(particles[1].get_Posy()) + " " +
-        #          colors[1] + '\n')
-        # fh.write(str(particles[2].rad) + " " + str(particles[2].get_Posx()) + " " + str(particles[2].get_Posy()) + " " +
-        #           colors[2] + '\n')
-        # fh.write(str(particles[3].rad) + " " + str(particles[3].get_Posx()) + " " + str(particles[3].get_Posy()) + " " +
-        #          colors[3] + '\n')
+        particles.append(Particle(RADIUS, 0, 0,
+                                 300, 250,
+                                 colors[3],
+                                 1))
+        fh.write(str(particles[0].rad) + " " + str(particles[0].get_Posx()) + " " + str(particles[0].get_Posy()) + " " +
+                 colors[0] + '\n')
+        fh.write(str(particles[1].rad) + " " + str(particles[1].get_Posx()) + " " + str(particles[1].get_Posy()) + " " +
+                 colors[1] + '\n')
+        fh.write(str(particles[2].rad) + " " + str(particles[2].get_Posx()) + " " + str(particles[2].get_Posy()) + " " +
+                  colors[2] + '\n')
+        fh.write(str(particles[3].rad) + " " + str(particles[3].get_Posx()) + " " + str(particles[3].get_Posy()) + " " +
+                 colors[3] + '\n')
 
         fh.write('\n')
     # END OF INITIALIZING STUFF
@@ -230,19 +230,19 @@ def main():
                 max_vel = sub_particles[i].vel()
             tmp += 1 #Index variable used above
 
-        max_vels = comm.gather(max_vel, root=0)
-        global timestep_rat
-        if rank == 0:
-            maximum = max(max_vels)
-          #  print(maximum)
-            if maximum > 10:
+        # max_vels = comm.gather(max_vel, root=0)
+        # global timestep_rat
+        # if rank == 0:
+        #     maximum = max(max_vels)
+        #   #  print(maximum)
+        #     if maximum > 10:
+        #
+        #         timestep_rat= 10 / maximum
+        #        # print(round(timestep *timestep_rat,2))
+        #
+        # timestep_rat = comm.bcast(timestep_rat,root=0)
 
-                timestep_rat= 10 / maximum
-               # print(round(timestep *timestep_rat,2))
-
-        timestep_rat = comm.bcast(timestep_rat,root=0)
-
-        print("RANK = ", rank, timestep_rat)
+       # print("RANK = ", rank, timestep_rat)
 
         for i in range(blocksize):
             y1 = sub_particles[i].get_Posy()
@@ -327,7 +327,7 @@ def main():
 
                                 vel1x = u1[0] * (mass1 - mass2) / (mass1 + mass2) + u2[0] * 2 * mass2 / (
                                             mass1 + mass2)
-                                vel2x = u2[0] * (mass2 - mass1) / (mass1 + mass2) + u1[0] * 2 * mass2 / (
+                                vel2x = u2[0] * (mass2 - mass1) / (mass1 + mass2) + u1[0] * 2 * mass1 / (
                                             mass1 + mass2)
                                 vel1y = u1[1]
                                 vel2y = u2[1]
@@ -340,6 +340,7 @@ def main():
 
                                 particles[k].velx = vFinal2[0]
                                 particles[k].vely = vFinal2[1]
+                                print("COLOR ", particles[k].color, "AFTER COLLISION ", particles[k].vel())
 
 
                 #GRAVITY STARTS HERE
