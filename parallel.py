@@ -16,16 +16,28 @@ timestep = .03
 
 # *********
 # ALTERABLE VARIABLES
-WIDTH = 500  # WIDTH AND HEIGHT PF DISPLAYING WINDOW, THESE TWO MUST BE
+WIDTH = 800  # WIDTH AND HEIGHT PF DISPLAYING WINDOW, THESE TWO MUST BE
 HEIGHT = 500  # BIG ENOUGH TO FIT ALL THE BALLS OR ERROR WILL OCCUR
 RADIUS = 10  # RADIUS OF BALLS
-duration = 20  # DURATION OF PROGRAM
-num_particles = 16 # NUMBER OF PARTICLES
-G_CONST = 1  # Gravitational Constant
-co_frict = .1  # COEFFECIENT OF FRICTION
+duration = 100  # DURATION OF PROGRAM
+num_particles = 4 # NUMBER OF PARTICLES
+G_CONST =1  # Gravitational Constant
+co_frict = 0  # COEFFECIENT OF FRICTION
 SPEED_RANGE = [-8, 8]  # Range of Speed particles start out with, first number must be less than second
 # *********
 
+#WORKED W GCONST 5
+# particles.append(Particle(7, 0, 0,
+#                                   400, 250,
+#                                   colors[0],
+#                                  1000))
+#
+#         particles.append(Particle(1, 0, 1,
+#                                 550, 250,
+#                                  colors[1],
+#                                  1))
+
+#
 g_acel = 9.8
 
 
@@ -136,76 +148,76 @@ def main():
         fh.write(str(num_timesteps) + '\n')
         fh.write('\n')
         #
-        for i in range(num_particles):
-
-            x = random.randint(RADIUS, WIDTH - RADIUS)
-            y = random.randint(RADIUS, HEIGHT - RADIUS)
-            rad = RADIUS
-            k = 0
-
-            while (k < len(particles)):
-                if get_distance(particles[k].get_Posx(), x, particles[k].get_Posy(), y) <= particles[k].rad + rad:
-                    x = random.randint(RADIUS, WIDTH - RADIUS)
-                    y = random.randint(RADIUS, HEIGHT - RADIUS)
-                    k = 0
-                else:
-                    k += 1
-            # print(j, len(colors))
-            particles.append(Particle(RADIUS, random.randint(SPEED_RANGE[0], SPEED_RANGE[1]),
-                                      random.randint(SPEED_RANGE[0], SPEED_RANGE[1]),
-                                      x, y,
-                                      colors[j],
-                                      1))
-            # if j == 0:
-            #    particles[0].velx = 0;
-            #   particles[0].vely = 0;
-
-            while particles[i].velx == 0 and particles[i].vely == 0:
-                particles[i].velx = random.randint(SPEED_RANGE[0], SPEED_RANGE[1])
-
-                particles[i].vely = random.randint(SPEED_RANGE[0], SPEED_RANGE[1])
-
-            fh.write(
-                str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " +
-                colors[j] + '\n')
-            j += 1
-
-            if j == len(colors):
-                j = 0
+        # for i in range(num_particles):
+        #
+        #     x = random.randint(RADIUS, WIDTH - RADIUS)
+        #     y = random.randint(RADIUS, HEIGHT - RADIUS)
+        #     rad = RADIUS
+        #     k = 0
+        #
+        #     while (k < len(particles)):
+        #         if get_distance(particles[k].get_Posx(), x, particles[k].get_Posy(), y) <= particles[k].rad + rad:
+        #             x = random.randint(RADIUS, WIDTH - RADIUS)
+        #             y = random.randint(RADIUS, HEIGHT - RADIUS)
+        #             k = 0
+        #         else:
+        #             k += 1
+        #     # print(j, len(colors))
+        #     particles.append(Particle(RADIUS, random.randint(SPEED_RANGE[0], SPEED_RANGE[1]),
+        #                               random.randint(SPEED_RANGE[0], SPEED_RANGE[1]),
+        #                               x, y,
+        #                               colors[j],
+        #                               1))
+        #     # if j == 0:
+        #     #    particles[0].velx = 0;
+        #     #   particles[0].vely = 0;
+        #
+        #     while particles[i].velx == 0 and particles[i].vely == 0:
+        #         particles[i].velx = random.randint(SPEED_RANGE[0], SPEED_RANGE[1])
+        #
+        #         particles[i].vely = random.randint(SPEED_RANGE[0], SPEED_RANGE[1])
+        #
+        #     fh.write(
+        #         str(particles[i].rad) + " " + str(particles[i].get_Posx()) + " " + str(particles[i].get_Posy()) + " " +
+        #         colors[j] + '\n')
+        #     j += 1
+        #
+        #     if j == len(colors):
+        #         j = 0
 
             # radius, posx, posy, color, mass
 
-        # particles.append(Particle(100, 0, 0,
-        #                           110, 120,
-        #                           colors[0],
-        #                           100000))
+        particles.append(Particle(20, 0, 0,
+                                  400, 250,
+                                  colors[0],
+                                 3000))
+
+        particles.append(Particle(5, 0, 1,
+                                500, 250,
+                                 colors[1],
+                                 1))
+
         #
-        # particles.append(Particle(RADIUS, 0, 0,
-        #                          350, 363,
-        #                          colors[1],
-        #                          1))
-        #
-        #
-        # particles.append(Particle(RADIUS, 0, 0,
-        #                          250, 450,
-        #                          colors[2],
-        #                          1))
-        #
-        #
-        # particles.append(Particle(RADIUS, 0, 0,
-        #                          300, 250,
-        #                          colors[3],
-        #                          1))
+        particles.append(Particle(5, 0, .5,
+                                 650, 250,
+                                 colors[2],
+                                 1))
         #
         #
-        # fh.write(str(particles[0].rad) + " " + str(particles[0].get_Posx()) + " " + str(particles[0].get_Posy()) + " " +
-        #          colors[0] + '\n')
-        # fh.write(str(particles[1].rad) + " " + str(particles[1].get_Posx()) + " " + str(particles[1].get_Posy()) + " " +
-        #          colors[1] + '\n')
-        # fh.write(str(particles[2].rad) + " " + str(particles[2].get_Posx()) + " " + str(particles[2].get_Posy()) + " " +
-        #           colors[2] + '\n')
-        # fh.write(str(particles[3].rad) + " " + str(particles[3].get_Posx()) + " " + str(particles[3].get_Posy()) + " " +
-        #          colors[3] + '\n')
+        particles.append(Particle(5, 0, 1.5,
+                                 440, 250,
+                                 colors[3],
+                                 1))
+        #
+        #
+        fh.write(str(particles[0].rad) + " " + str(particles[0].get_Posx()) + " " + str(particles[0].get_Posy()) + " " +
+                 colors[0] + '\n')
+        fh.write(str(particles[1].rad) + " " + str(particles[1].get_Posx()) + " " + str(particles[1].get_Posy()) + " " +
+                 colors[1] + '\n')
+        fh.write(str(particles[2].rad) + " " + str(particles[2].get_Posx()) + " " + str(particles[2].get_Posy()) + " " +
+                  colors[2] + '\n')
+        fh.write(str(particles[3].rad) + " " + str(particles[3].get_Posx()) + " " + str(particles[3].get_Posy()) + " " +
+                 colors[3] + '\n')
 
         fh.write('\n')
     # END OF INITIALIZING STUFF
